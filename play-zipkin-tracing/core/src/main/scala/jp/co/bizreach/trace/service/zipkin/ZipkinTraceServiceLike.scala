@@ -17,7 +17,7 @@ trait ZipkinTraceServiceLike extends TraceServiceLike {
   val service: ZipkinServiceLike
   val sampleRate: Double
 
-  def genereteTrace(name: String, cassette: ZipkinTraceCassette): ZipkinTraceCassette = {
+  def generateTrace(name: String, cassette: ZipkinTraceCassette): ZipkinTraceCassette = {
     ZipkinTraceCassette(service.generateSpan(name, cassette.span), cassette.sampled)
   }
 

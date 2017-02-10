@@ -24,7 +24,7 @@ class ZipkinTraceFilter @Inject() (zipkinTracer: ZipkinTraceServiceLike)(implici
   private val reqHeaderToSpanName: RequestHeader => String = ZipkinTraceFilter.ParamAwareRequestNamer
 
   def apply(nextFilter: (RequestHeader) => Future[Result])(req: RequestHeader): Future[Result] = {
-    Try(zipkinTracer.genereteTrace(reqHeaderToSpanName(req), req2trace(req))).toOption.fold {
+    Try(zipkinTracer.generateTrace(reqHeaderToSpanName(req), req2trace(req))).toOption.fold {
       nextFilter(req)
     }{ parentCassette =>
       val fMaybeServerSpan = zipkinTracer.serverReceived(parentCassette).recover{ case NonFatal(e) => None }
