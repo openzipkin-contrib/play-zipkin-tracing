@@ -7,7 +7,7 @@ import play.api.mvc.{Action, Controller, RequestHeader}
 import services.ApiSampleService
 
 import scala.concurrent.{ExecutionContext, Future}
-
+import jp.co.bizreach.trace.play25.implicits.TraceImplicits._
 
 /**
   * Created by nishiyama on 2016/12/05.
@@ -17,19 +17,15 @@ class IndexController @Inject() (
 ) (
   implicit ec: ExecutionContext
 ) extends Controller {
-  import com.stanby.trace.play25.implicits.TraceImplicits._
-
 
   def index = Action.async { implicit req =>
     Future.successful(Ok(Json.obj("status" -> "ok")))
   }
 
-
   def once = Action.async { implicit req =>
     Logger.debug(req.headers.toSimpleMap.map{ case (k, v) => s"${k}:${v}"}.toSeq.mkString("\n"))
 
     service.sample("http://localhost:9992/api/once").map(_ => Ok(Json.obj("OK"->"OK")))
-
   }
 
   def nest = Action.async { implicit req =>

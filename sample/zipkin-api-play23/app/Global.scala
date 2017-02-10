@@ -1,4 +1,4 @@
-import com.stanby.trace.play23.filter.ZipkinTraceFilter
+import jp.co.bizreach.trace.play23.filter.ZipkinTraceFilter
 import play.api.GlobalSettings
 import play.api.mvc.WithFilters
 

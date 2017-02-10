@@ -2,12 +2,12 @@ package controllers
 
 import javax.inject.Inject
 
-import com.stanby.trace.service.{TraceServiceLike, TracedFuture}
+import jp.co.bizreach.trace.service.{TraceServiceLike, TracedFuture}
+import jp.co.bizreach.trace.play25.implicits.TraceImplicits._
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
 import play.api.mvc.{Action, Controller}
-
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
 
@@ -30,7 +30,6 @@ class ApiController @Inject() (ws: WSClient)(implicit val traceService: TraceSer
   }
 
   def nest = Action.async { implicit req =>
-    import com.stanby.trace.play25.implicits.TraceImplicits._
     val waited = Random.nextInt(900)
     Thread.sleep(waited + 100)
 

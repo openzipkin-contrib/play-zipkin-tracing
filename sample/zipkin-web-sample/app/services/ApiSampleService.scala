@@ -2,7 +2,7 @@ package services
 
 import javax.inject.Inject
 
-import com.stanby.trace.service.{Trace, TraceCassette, TraceServiceLike}
+import jp.co.bizreach.trace.service.{Trace, TraceCassette, TraceServiceLike}
 import repositories.ApiRepository
 
 import scala.concurrent.Future
