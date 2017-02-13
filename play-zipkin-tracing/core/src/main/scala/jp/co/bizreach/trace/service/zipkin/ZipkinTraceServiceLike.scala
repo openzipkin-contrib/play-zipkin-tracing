@@ -5,7 +5,7 @@ import com.twitter.zipkin.gen.Span
 import jp.co.bizreach.trace.service.{TraceCassette, TraceServiceLike}
 
 import scala.concurrent.duration.FiniteDuration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ExecutionContext, Await, Future}
 import scala.util.control.NonFatal
 import scala.util.{Failure, Random, Success, Try}
 
@@ -14,6 +14,7 @@ import scala.util.{Failure, Random, Success, Try}
   */
 trait ZipkinTraceServiceLike extends TraceServiceLike {
 
+  implicit val executionContext: ExecutionContext
   val service: ZipkinServiceLike
   val sampleRate: Double
 
@@ -58,8 +59,6 @@ trait ZipkinTraceServiceLike extends TraceServiceLike {
   }
 
   override def traceFuture[A](traceName: String, parentCassette: TraceCassette, annotations: Seq[(String, String)])(f: Option[TraceCassette] => Future[A]): Future[A] = {
-    import service.eCtx // Because tracing-related tasks should use the same ExecutionContext
-
     parentCassette match {
       case zipkinParentCassette: ZipkinTraceCassette if zipkinParentCassette.sampled =>
         endAnnotations(traceName, zipkinParentCassette.span, annotations: _*)(o => f(o.map(s => ZipkinTraceCassette(s))).map((_, Seq.empty)))
@@ -69,8 +68,6 @@ trait ZipkinTraceServiceLike extends TraceServiceLike {
   }
 
   def endAnnotations[A](traceName: String, parentSpan: Span, annotations: (String, String)*)(f: Option[Span] => Future[(A, Seq[(String, String)])]): Future[A] = {
-    import service.eCtx // Because tracing-related tasks should use the same ExecutionContext
-
     Try(service.generateSpan(traceName, parentSpan)).toOption.fold {
       // TODO: デバッグログ
       f(None).map(_._1)
@@ -103,8 +100,6 @@ trait ZipkinTraceServiceLike extends TraceServiceLike {
   }
 
   protected def simple[A](traceName: String, parentSpan: Span, annotations: (String, String)*)(f: Option[TraceCassette] => (A, Seq[(String, String)])): A = {
-    import service.eCtx
-
     Try(service.generateSpan(traceName, parentSpan)).toOption.fold {
       f(None)._1
     } { childSpan =>

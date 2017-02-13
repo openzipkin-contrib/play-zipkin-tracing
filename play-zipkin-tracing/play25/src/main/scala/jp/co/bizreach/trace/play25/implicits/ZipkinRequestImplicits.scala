@@ -2,13 +2,12 @@ package jp.co.bizreach.trace.play25.implicits
 
 import java.math.BigInteger
 
-import jp.co.bizreach.trace.service.TraceServiceLike
-import jp.co.bizreach.trace.service.zipkin.{TraceHttpHeaders, ZipkinTraceCassette}
+import jp.co.bizreach.trace.service.zipkin.ZipkinTraceCassette
 import com.twitter.zipkin.gen.Span
 import jp.co.bizreach.trace.service.{TraceCassette, TraceServiceLike}
 import jp.co.bizreach.trace.service.zipkin.SpanHttpHeaders
-import play.api.mvc.RequestHeader
 import play.api.libs.ws._
+import play.api.mvc.RequestHeader
 
 import scala.util.Try
 
@@ -31,7 +30,7 @@ trait ZipkinRequestImplicits {
 
   implicit def req2span(implicit req: RequestHeader): Span = {
     val span = new Span
-    import jp.co.bizreach.trace.service.zipkin.SpanHttpHeaders._
+    import SpanHttpHeaders._
     def hexStringToLong(s: String): Long = {
       new BigInteger(s, 16).longValue()
     }

@@ -1,13 +1,15 @@
 package jp.co.bizreach.trace.service.zipkin
 
-/**
-  * Created by nishiyama on 2016/12/08.
-  */
-case class ZipkinTraceConfig(
-  serviceName: String,
-  serviceHost: String,
-  servicePort: Int,
-  zipkinHost: String,
-  zipkinPort: Int,
-  zipkinMock: Boolean
-)
+object ZipkinTraceConfig {
+  val zipkinAkkaName = "zipkin-trace-context"
+
+  val zipkinServiceHost = "trace.serviceHost"
+  val zipkinServicePort = "trace.servicePort"
+  val zipkinServiceName = "trace.serviceName"
+
+  val zipkinHost = "trace.zipkin.host"
+  val zipkinPort = "trace.zipkin.port"
+  val zipkinMock = "trace.zipkin.mock"
+  val zipkinSampleRate = "trace.zipkin.sampleRate"
+
+}
