@@ -27,8 +27,8 @@ class ZipkinTraceFilter extends Filter with ZipkinRequestImplicits {
         case Some(serverSpan) =>
           val result = nextFilter(addHeadersToReq(req, parentCassette))
           result.onComplete {
-            case Failure(t) => ZipkinTraceService.serverSent(parentCassette, serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
-            case _ => ZipkinTraceService.serverSent(parentCassette, serverSpan)
+            case Failure(t) => ZipkinTraceService.serverSend(parentCassette, serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
+            case _ => ZipkinTraceService.serverSend(parentCassette, serverSpan)
           }
           result
       }

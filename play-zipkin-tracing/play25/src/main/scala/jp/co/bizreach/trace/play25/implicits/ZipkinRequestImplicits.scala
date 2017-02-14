@@ -40,7 +40,7 @@ trait ZipkinRequestImplicits {
     } yield id
     ghettoBind(TraceIdHeaderKey).foreach(span.setTrace_id)
     ghettoBind(SpanIdHeaderKey).foreach(span.setId)
-    ghettoBind(ParentIdHeaderKey).foreach(span.setParent_id)
+    ghettoBind(ParentIdHeaderKey).foreach(x => span.setParent_id(x))
     span
   }
 

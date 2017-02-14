@@ -30,8 +30,8 @@ class ZipkinTraceFilter @Inject() (zipkinTracer: ZipkinTraceServiceLike)(implici
         case Some(serverSpan) =>
           val result = nextFilter(addHeadersToReq(req, parentCassette))
           result.onComplete {
-            case Failure(t) => zipkinTracer.serverSent(parentCassette, serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
-            case _ => zipkinTracer.serverSent(parentCassette, serverSpan)
+            case Failure(t) => zipkinTracer.serverSend(parentCassette, serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
+            case _ => zipkinTracer.serverSend(parentCassette, serverSpan)
           }
           result
       }
