@@ -15,7 +15,6 @@ import scala.concurrent.ExecutionContext
   * Created by nishiyama on 2016/12/08.
   */
 class ZipkinTraceService @Inject() (
-  //val api: implicits.ZipkinTraceImplicits,
   conf: Configuration,
   actorSystem: ActorSystem) extends ZipkinTraceServiceLike {
 

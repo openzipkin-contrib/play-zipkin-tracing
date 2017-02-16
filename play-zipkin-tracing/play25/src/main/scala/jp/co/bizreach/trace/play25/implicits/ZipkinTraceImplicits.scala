@@ -1,7 +1,5 @@
 package jp.co.bizreach.trace.play25.implicits
 
-import javax.inject.Inject
-
 import jp.co.bizreach.trace.zipkin.{ZipkinTraceCassette, ZipkinTraceServiceLike}
 import jp.co.bizreach.trace.{TraceCassette, TraceImplicits}
 import play.api.libs.ws.WSRequest

@@ -28,6 +28,4 @@ object ZipkinTraceService extends ZipkinTraceServiceLike {
     )
     .build()
 
-  val api = new implicits.ZipkinTraceImplicits {}
-
 }
