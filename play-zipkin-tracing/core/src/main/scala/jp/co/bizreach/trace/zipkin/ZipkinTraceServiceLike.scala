@@ -39,7 +39,7 @@ trait ZipkinTraceServiceLike extends TraceService {
     }).extract(headers)
 
     Option(contextOrFlags.context())
-      .map(tracer.joinSpan)
+      .map(tracer.newChild)
       .getOrElse(tracer.newTrace(contextOrFlags.samplingFlags()))
   }
 
