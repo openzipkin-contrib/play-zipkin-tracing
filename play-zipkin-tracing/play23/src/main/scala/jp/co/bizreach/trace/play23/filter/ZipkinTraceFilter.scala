@@ -1,47 +1,37 @@
 package jp.co.bizreach.trace.play23.filter
 
-import jp.co.bizreach.trace.play23.impl.ZipkinTraceService
-import jp.co.bizreach.trace.play23.implicits.ZipkinRequestImplicits
-import jp.co.bizreach.trace.service.zipkin.ZipkinTraceCassette
+import jp.co.bizreach.trace.play23.ZipkinTraceService
 import play.api.mvc.{Filter, Headers, RequestHeader, Result}
 
 import scala.concurrent.Future
 import scala.util.Failure
-import scala.util.control.NonFatal
 
 /**
   * Created by nishiyama on 2016/12/09.
   */
-class ZipkinTraceFilter extends Filter with ZipkinRequestImplicits {
+class ZipkinTraceFilter extends Filter {
 
   import ZipkinTraceService.executionContext
   private val reqHeaderToSpanName: RequestHeader => String = ZipkinTraceFilter.ParamAwareRequestNamer
 
   def apply(nextFilter: (RequestHeader) => Future[Result])(req: RequestHeader): Future[Result] = {
-    val parentCassette = ZipkinTraceService.generateTrace(reqHeaderToSpanName(req), req2trace(req))
-
-    ZipkinTraceService.serverReceived(parentCassette)
-      .recover { case NonFatal(e) => None }
-      .flatMap {
-        case None => nextFilter(req)
-        case Some(serverSpan) =>
-          val result = nextFilter(addHeadersToReq(req, parentCassette))
-          result.onComplete {
-            case Failure(t) => ZipkinTraceService.serverSend(parentCassette, serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
-            case _ => ZipkinTraceService.serverSend(parentCassette, serverSpan)
-          }
-          result
+    ZipkinTraceService.serverReceived(
+      traceName = reqHeaderToSpanName(req),
+      span      = ZipkinTraceService.toSpan(req.headers)((headers, key) => headers.get(key))
+    ).flatMap { serverSpan =>
+      val result = nextFilter(req.copy(headers = new Headers {
+        protected val data: Seq[(String, Seq[String])] = {
+          req.headers.toMap ++ ZipkinTraceService.toMap(serverSpan).map { case (key, value) => key -> Seq(value) }
+        }.toSeq
+      }))
+      result.onComplete {
+        case Failure(t) => ZipkinTraceService.serverSend(serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
+        case _ => ZipkinTraceService.serverSend(serverSpan)
       }
-  }
-
-  private[filter] def addHeadersToReq(req: RequestHeader, cassette: ZipkinTraceCassette): RequestHeader = {
-    val originalHeaderData = req.headers.toMap
-    val withCassetteData = originalHeaderData ++ ZipkinTraceService.cassetteToMap(cassette).map { case (key, value) => key -> Seq(value) }
-    val newHeaders = new Headers{ override val data: Seq[(String, Seq[String])] = withCassetteData.mapValues(_.headOption.map(Seq(_)).getOrElse(Seq(""))).toSeq }
-    req.copy(headers = newHeaders)
+      result
+    }
   }
 }
-
 
 object ZipkinTraceFilter {
   val ParamAwareRequestNamer: RequestHeader => String = { reqHeader =>

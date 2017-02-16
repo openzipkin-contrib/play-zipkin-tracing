@@ -1,4 +1,4 @@
-package jp.co.bizreach.trace.service.zipkin
+package jp.co.bizreach.trace.zipkin
 
 object ZipkinTraceConfig {
   val zipkinAkkaName = "zipkin-trace-context"
