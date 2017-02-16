@@ -3,20 +3,22 @@ package controllers
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
-import play.api.mvc.{Action, Controller, RequestHeader}
+import play.api.mvc.{Action, Controller}
 import services.ApiSampleService
 
 import scala.concurrent.{ExecutionContext, Future}
-import jp.co.bizreach.trace.play25.implicits.TraceImplicits._
+import jp.co.bizreach.trace.play25.ZipkinTraceService
+import jp.co.bizreach.trace.play25.implicits.ZipkinTraceImplicits
 
 /**
   * Created by nishiyama on 2016/12/05.
   */
 class IndexController @Inject() (
-  service: ApiSampleService
+  service: ApiSampleService,
+  val tracer: ZipkinTraceService
 ) (
   implicit ec: ExecutionContext
-) extends Controller {
+) extends Controller with ZipkinTraceImplicits {
 
   def index = Action.async { implicit req =>
     Future.successful(Ok(Json.obj("status" -> "ok")))

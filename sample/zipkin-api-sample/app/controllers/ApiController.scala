@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
-import jp.co.bizreach.trace.service.{TraceServiceLike, TracedFuture}
-import jp.co.bizreach.trace.play25.implicits.TraceImplicits._
+import jp.co.bizreach.trace.play25.ZipkinTraceService
+import jp.co.bizreach.trace.play25.implicits.ZipkinTraceImplicits
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.libs.ws.WSClient
@@ -14,7 +14,12 @@ import scala.util.Random
 /**
   * Created by nishiyama on 2016/12/05.
   */
-class ApiController @Inject() (ws: WSClient)(implicit val traceService: TraceServiceLike, implicit val ec: ExecutionContext) extends Controller {
+class ApiController @Inject() (
+  ws: WSClient, 
+  val tracer: ZipkinTraceService
+)(
+  implicit val ec: ExecutionContext
+) extends Controller with ZipkinTraceImplicits {
 
   def once = Action.async { implicit req =>
     Logger.debug(req.headers.toSimpleMap.map{ case (k, v) => s"${k}:${v}"}.toSeq.mkString("\n"))
@@ -33,7 +38,7 @@ class ApiController @Inject() (ws: WSClient)(implicit val traceService: TraceSer
     val waited = Random.nextInt(900)
     Thread.sleep(waited + 100)
 
-    TracedFuture("zipkin-api-nest-call"){ implicit cassette =>
+    tracer.traceFuture("zipkin-api-nest-call"){ cassette =>
       ws.url("http://localhost:9992/api/once")
         .withTraceHeader()
         .get().map{ res =>
