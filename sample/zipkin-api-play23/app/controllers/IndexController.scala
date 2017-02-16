@@ -15,9 +15,9 @@ object IndexController extends Controller with ZipkinTraceImplicits {
   implicit val tracer = ZipkinTraceService
 
   def sample = Action.async{ implicit request =>
-    tracer.traceFuture("play23-api-call"){ c =>
+    tracer.traceFuture("play23-api-call"){ cassette =>
       WS.url("http://localhost:9992/api/once")
-        .withTraceHeader()
+        .withTraceHeader(cassette)
         .get().map{ res =>
         Ok(res.json)
       }

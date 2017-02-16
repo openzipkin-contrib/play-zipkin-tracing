@@ -18,7 +18,7 @@ trait ZipkinTraceImplicits extends TraceImplicits {
   }
 
   implicit class RichWSRequest(r: WSRequestHolder) {
-    def withTraceHeader()(implicit cassette: TraceCassette): WSRequestHolder = {
+    def withTraceHeader(cassette: TraceCassette): WSRequestHolder = {
       r.withHeaders(ZipkinTraceService.toMap(cassette).toSeq: _*)
     }
   }

@@ -40,7 +40,7 @@ class ApiController @Inject() (
 
     tracer.traceFuture("zipkin-api-nest-call"){ cassette =>
       ws.url("http://localhost:9992/api/once")
-        .withTraceHeader()
+        .withTraceHeader(cassette)
         .get().map{ res =>
         Ok(res.json)
       }

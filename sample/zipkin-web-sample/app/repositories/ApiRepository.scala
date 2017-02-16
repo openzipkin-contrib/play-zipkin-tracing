@@ -22,7 +22,7 @@ class ApiRepository @Inject() (
     tracer.traceFuture("zipkin-api-call"){ cassette =>
       Logger.debug(cassette.toString)
       ws.url(url)
-        .withTraceHeader()
+        .withTraceHeader(cassette)
         .get().map(_ => "OK")
     }
   }
