@@ -56,18 +56,18 @@ trait ZipkinTraceServiceLike {
   }
 
   // TODO implement this method!
-  def trace[A](traceName: String, tags: (String, String)*)(f: TraceData => A)(implicit parentData: TraceData): A = ???
+  def trace[A](traceName: String, tags: (String, String)*)(f: => A)(implicit parentData: TraceData): A = ???
 
-  def traceFuture[A](traceName: String, tags: (String, String)*)(f: TraceData => Future[A])(implicit parentDate: TraceData): Future[A] = {
-    sample(traceName, parentDate.span, tags: _*)(s => f(TraceData(s)))
+  def traceFuture[A](traceName: String, tags: (String, String)*)(f: => Future[A])(implicit parentDate: TraceData): Future[A] = {
+    sample(traceName, parentDate.span, tags: _*)(f)
   }
 
-  private[trace] def sample[A](name: String, parent: Span, tags: (String, String)*)(f: Span => Future[A]): Future[A] = {
+  private[trace] def sample[A](name: String, parent: Span, tags: (String, String)*)(f: => Future[A]): Future[A] = {
     val childSpan = tracer.newChild(parent.context()).name(name).kind(Span.Kind.CLIENT)
     tags.foreach { case (key, value) => childSpan.tag(key, value) }
     childSpan.start()
 
-    val result = f(childSpan)
+    val result = f
 
     result.onComplete {
       case Failure(t) =>

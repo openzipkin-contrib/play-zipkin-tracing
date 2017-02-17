@@ -48,8 +48,8 @@ class TraceWSRequest(spanName: String, request: WSRequestHolder, traceData: Trac
 
   override def withMethod(method: String): WSRequestHolder = new TraceWSRequest(spanName, request.withMethod(method), traceData)
 
-  override def execute(): Future[Response] = ZipkinTraceService.traceFuture(spanName){ _ => request.execute() }(traceData)
+  override def execute(): Future[Response] = ZipkinTraceService.traceFuture(spanName){ request.execute() }(traceData)
 
-  override def stream(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = request.stream()
+  override def stream(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = ZipkinTraceService.traceFuture(spanName){ request.stream() }(traceData)
 
 }
