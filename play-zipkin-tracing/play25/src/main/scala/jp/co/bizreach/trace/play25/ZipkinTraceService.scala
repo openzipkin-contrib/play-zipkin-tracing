@@ -4,7 +4,7 @@ import javax.inject.Inject
 
 import akka.actor.ActorSystem
 import brave.Tracer
-import jp.co.bizreach.trace.zipkin.{ZipkinTraceServiceLike, ZipkinTraceConfig}
+import jp.co.bizreach.trace.{ZipkinTraceServiceLike, ZipkinTraceConfig}
 import play.api.Configuration
 import zipkin.reporter.AsyncReporter
 import zipkin.reporter.okhttp3.OkHttpSender

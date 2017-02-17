@@ -1,10 +1,10 @@
 package controllers
 
-import jp.co.bizreach.trace.play23.ZipkinTraceService
+import jp.co.bizreach.trace.play23.TraceWS
 import jp.co.bizreach.trace.play23.implicits.ZipkinTraceImplicits
-import play.api.libs.ws.WS
 import play.api.mvc.{Action, Controller}
 import play.api.Play.current
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
@@ -12,15 +12,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 object IndexController extends Controller with ZipkinTraceImplicits {
 
-  implicit val tracer = ZipkinTraceService
-
   def sample = Action.async{ implicit request =>
-    tracer.traceFuture("play23-api-call"){ cassette =>
-      WS.url("http://localhost:9992/api/once")
-        .withTraceHeader(cassette)
-        .get().map{ res =>
-        Ok(res.json)
-      }
-    }
+    TraceWS.url("play23-api-call", "http://localhost:9992/api/once")
+      .get().map { res => Ok(res.json) }
   }
 }

@@ -1,8 +1,7 @@
 package jp.co.bizreach.trace.play25.module
 
-import jp.co.bizreach.trace.TraceService
 import jp.co.bizreach.trace.play25.ZipkinTraceService
-import jp.co.bizreach.trace.zipkin.ZipkinTraceServiceLike
+import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module}
 
@@ -12,8 +11,7 @@ import play.api.inject.{Binding, Module}
 class ZipkinModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
-      bind[ZipkinTraceServiceLike].to[ZipkinTraceService],
-      bind[TraceService].to[ZipkinTraceService]
+      bind[ZipkinTraceServiceLike].to[ZipkinTraceService]
     )
   }
 }
