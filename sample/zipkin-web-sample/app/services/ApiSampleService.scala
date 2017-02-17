@@ -2,7 +2,7 @@ package services
 
 import javax.inject.Inject
 
-import jp.co.bizreach.trace.{TraceService, TraceCassette}
+import jp.co.bizreach.trace.{TraceData, ZipkinTraceServiceLike}
 import repositories.ApiRepository
 
 import scala.concurrent.Future
@@ -13,11 +13,11 @@ import scala.util.Random
   */
 class ApiSampleService @Inject() (
   repo: ApiRepository,
-  tracer: TraceService
+  tracer: ZipkinTraceServiceLike
 ) {
 
-  def sample(url: String)(implicit traceCassette: TraceCassette): Future[String] = {
-    tracer.trace("local-wait"){ implicit cassette =>
+  def sample(url: String)(implicit traceData: TraceData): Future[String] = {
+    tracer.trace("local-wait"){ implicit traceData =>
       Thread.sleep(300 + Random.nextInt(700))
     }
 

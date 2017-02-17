@@ -1,7 +1,7 @@
 package jp.co.bizreach.trace.play23
 
 import brave.Tracer
-import jp.co.bizreach.trace.zipkin._
+import jp.co.bizreach.trace._
 import play.api.{Play, Configuration}
 import play.api.libs.concurrent.Akka
 import zipkin.reporter.AsyncReporter

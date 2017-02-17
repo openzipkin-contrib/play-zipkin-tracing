@@ -7,7 +7,7 @@ import play.api.mvc.{Action, Controller}
 import services.ApiSampleService
 
 import scala.concurrent.{ExecutionContext, Future}
-import jp.co.bizreach.trace.play25.ZipkinTraceService
+import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import jp.co.bizreach.trace.play25.implicits.ZipkinTraceImplicits
 
 /**
@@ -15,7 +15,7 @@ import jp.co.bizreach.trace.play25.implicits.ZipkinTraceImplicits
   */
 class IndexController @Inject() (
   service: ApiSampleService,
-  val tracer: ZipkinTraceService
+  val tracer: ZipkinTraceServiceLike
 ) (
   implicit ec: ExecutionContext
 ) extends Controller with ZipkinTraceImplicits {
