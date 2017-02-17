@@ -17,12 +17,12 @@ Add following configuration to `application.conf`:
 
 ```
 trace {
-  serviceName = "zipkin-api-sample"
+  service-name = "zipkin-api-sample"
 
   zipkin {
     host = "localhost"
     port = 9410
-    sampleRate = 0.1
+    sample-rate = 0.1
   }
 }
 
