@@ -74,7 +74,7 @@ class ApiController @Inject() (ws: TraceWSClient)
   def test1 = Action { implicit request =>
     tracer.trace("sync"){
       println("Hello World!")
-      Ok
+      Ok
     }
   }
 
@@ -83,7 +83,7 @@ class ApiController @Inject() (ws: TraceWSClient)
     tracer.traceFuture("async"){
       Future {
         println("Hello World!")
-        Ok
+        Ok
       }
     }
   }
