@@ -61,7 +61,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class ApiController extends Controller with ZipkinTraceImplicits {
 
-  // Trace blocked action
+  // Trace blocking action
   def test1 = Action { implicit request =>
     ZipkinTraceService.trace("sync"){
       println("Hello World!")
