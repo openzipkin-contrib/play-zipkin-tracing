@@ -4,6 +4,7 @@ import javax.inject.Inject
 
 import akka.actor.ActorSystem
 import brave.Tracer
+import brave.sampler.Sampler
 import jp.co.bizreach.trace.{ZipkinTraceServiceLike, ZipkinTraceConfig}
 import play.api.Configuration
 import zipkin.reporter.AsyncReporter
@@ -18,15 +19,18 @@ class ZipkinTraceService @Inject() (
   conf: Configuration,
   actorSystem: ActorSystem) extends ZipkinTraceServiceLike {
 
-  implicit val executionContext: ExecutionContext = actorSystem.dispatchers.lookup(ZipkinTraceConfig.zipkinAkkaName)
+  implicit val executionContext: ExecutionContext = actorSystem.dispatchers.lookup(ZipkinTraceConfig.AkkaName)
 
   val tracer = Tracer.newBuilder()
-    .localServiceName(conf.getString(ZipkinTraceConfig.zipkinServiceName) getOrElse "example")
+    .localServiceName(conf.getString(ZipkinTraceConfig.ServiceName) getOrElse "example")
     .reporter(AsyncReporter
       .builder(OkHttpSender.create(
-        s"http://${conf.getString(ZipkinTraceConfig.zipkinHost) getOrElse "localhost"}:${conf.getInt(ZipkinTraceConfig.zipkinPort) getOrElse 9410}/api/v1/spans"
+        s"http://${conf.getString(ZipkinTraceConfig.ZipkinHost) getOrElse "localhost"}:${conf.getInt(ZipkinTraceConfig.ZipkinPort) getOrElse 9410}/api/v1/spans"
       ))
       .build()
+    )
+    .sampler(conf.getString(ZipkinTraceConfig.ZipkinSampleRate)
+      .map(s => Sampler.create(s.toFloat)) getOrElse Sampler.ALWAYS_SAMPLE
     )
     .build()
 
