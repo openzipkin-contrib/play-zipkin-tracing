@@ -56,6 +56,7 @@ import jp.co.bizreach.trace.play23.TraceWS
 import jp.co.bizreach.trace.play23.implicits.ZipkinTraceImplicits
 import play.api.mvc.{Action, Controller}
 import play.api.Play.current
+import play.api.libs.json.Json
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ApiController extends Controller with ZipkinTraceImplicits {
@@ -64,7 +65,7 @@ class ApiController extends Controller with ZipkinTraceImplicits {
   def test1 = Action { implicit request =>
     ZipkinTraceService.trace("sync"){
       println("Hello World!")
-      Ok
+      Ok(Json.obj("api" -> "once"))
     }
   }
 
@@ -73,7 +74,7 @@ class ApiController extends Controller with ZipkinTraceImplicits {
     ZipkinTraceService.traceFuture("async"){
       Future {
         println("Hello World!")
-        Ok
+        Ok(Json.obj("api" -> "once"))
       }
     }
   }
