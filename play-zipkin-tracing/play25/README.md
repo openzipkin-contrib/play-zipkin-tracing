@@ -19,8 +19,6 @@ Add following configuration to `application.conf`:
 play.http.filters=filters.Filters
 
 trace {
-  serviceHost = "localhost"
-  servicePort = "9910"
   serviceName = "zipkin-api-sample"
 
   zipkin {

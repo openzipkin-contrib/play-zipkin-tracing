@@ -17,8 +17,6 @@ Add following configuration to `application.conf`:
 
 ```
 trace {
-  serviceHost = "localhost"
-  servicePort = "9910"
   serviceName = "zipkin-api-sample"
 
   zipkin {
