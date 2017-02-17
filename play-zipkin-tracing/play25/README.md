@@ -61,6 +61,7 @@ In the controller, trace action and calling another services as following:
 package controllers
 
 import play.api.mvc.{Action, Controller}
+import play.api.libs.json.Json
 import jp.co.bizreach.trace.play25.{TraceWSClient, ZipkinTraceService}
 import jp.co.bizreach.trace.play25.implicits.ZipkinTraceImplicits
 import scala.concurrent.ExecutionContext
@@ -70,11 +71,11 @@ class ApiController @Inject() (ws: TraceWSClient)
   (implicit val tracer: ZipkinTraceServiceLike, val ec: ExecutionContext)
     extends Controller with ZipkinTraceImplicits {
 
-  // Trace blocked action
+  // Trace blocking action
   def test1 = Action { implicit request =>
     tracer.trace("sync"){
       println("Hello World!")
-      Ok
+      Ok(Json.obj("result" -> "ok"))
     }
   }
 
@@ -83,7 +84,7 @@ class ApiController @Inject() (ws: TraceWSClient)
     tracer.traceFuture("async"){
       Future {
         println("Hello World!")
-        Ok
+        Ok(Json.obj("result" -> "ok"))
       }
     }
   }
