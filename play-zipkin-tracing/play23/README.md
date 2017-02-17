@@ -61,11 +61,30 @@ import play.api.Play.current
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class ApiController extends Controller with ZipkinTraceImplicits {
-  
-  def test = Action.async { implicit req =>
-    TraceWS.url("async-all", "http://localhost:9992/api/hello")
+
+  // Trace blocked action
+  def test1 = Action { implicit request =>
+    ZipkinTraceService.trace("sync"){
+      println("Hello World!")
+      Ok
+    }
+  }
+
+  // Trace async action
+  def test2 = Action.async { implicit request =>
+    ZipkinTraceService.traceFuture("async"){
+      Future {
+        println("Hello World!")
+        Ok
+      }
+    }
+  }
+
+  // Trace WS request
+  def test3 = Action.async { implicit req =>
+    TraceWS.url("ws", "http://localhost:9992/api/hello")
       .get().map { res => Ok(res.json) }
   }
-  
+
 }
 ```

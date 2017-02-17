@@ -69,13 +69,32 @@ import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 
 class ApiController @Inject() (ws: TraceWSClient)
-  (implicit val tracer: ZipkinTraceServiceLike, val ec: ExecutionContext) 
+  (implicit val tracer: ZipkinTraceServiceLike, val ec: ExecutionContext)
     extends Controller with ZipkinTraceImplicits {
 
-  def test = Action.async { implicit req =>
-    ws.url("async-call", "http://localhost:9992/api/hello")
+  // Trace blocked action
+  def test1 = Action { implicit request =>
+    tracer.trace("sync"){
+      println("Hello World!")
+      Ok
+    }
+  }
+
+  // Trace async action
+  def test2 = Action.async { implicit request =>
+    tracer.traceFuture("async"){
+      Future {
+        println("Hello World!")
+        Ok
+      }
+    }
+  }
+
+  // Trace WS request
+  def test3 = Action.async { implicit request =>
+    ws.url("ws", "http://localhost:9992/api/hello")
       .get().map { res => Ok(res.json) }
   }
-  
+
 }
 ```
