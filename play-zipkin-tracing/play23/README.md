@@ -25,7 +25,6 @@ trace {
     host = "localhost"
     port = 9410
     sampleRate = 0.1
-    mock = false
   }
 }
 
@@ -55,42 +54,17 @@ In the controller, trace action and calling another services as following:
 ```scala
 package controllers
 
-import jp.co.bizreach.trace.play23.impl.ZipkinTraceService
-import jp.co.bizreach.trace.service.{Trace, TracedFuture}
-import play.api.libs.ws.WS
+import jp.co.bizreach.trace.play23.TraceWS
+import jp.co.bizreach.trace.play23.implicits.ZipkinTraceImplicits
 import play.api.mvc.{Action, Controller}
 import play.api.Play.current
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent._
-import scala.concurrent.duration._
 
-class ApiController extends Controller {
-
-  import jp.co.bizreach.trace.play23.implicits.TraceImplicits._
-  implicit val traceService = ZipkinTraceService
+class ApiController extends Controller with ZipkinTraceImplicits {
   
-  // Trace sync action
-  def test1 = Action { implicit req =>
-    Trace("sync-call"){ implicit cassette =>
-      val f = ws.url("http://localhost:9992/api/hello")
-        .withTraceHeader() // Call withTraceHeader to set Zipkin headers
-        .get().map { res =>
-        Ok(res.json)
-      }
-      Await.result(f, Duration.Inf)
-    }
-  }
-
-  // Trace async action
-  def test2 = Action.async { implicit req =>
-    // Use TracedFuture instead of Future
-    TracedFuture("async-call"){ implicit cassette =>
-      ws.url("http://localhost:9992/api/hello")
-        .withTraceHeader() // Call withTraceHeader to set Zipkin headers
-        .get().map { res =>
-        Ok(res.json)
-      }
-    }
+  def test = Action.async { implicit req =>
+    TraceWS.url("async-all", "http://localhost:9992/api/hello")
+      .get().map { res => Ok(res.json) }
   }
   
 }

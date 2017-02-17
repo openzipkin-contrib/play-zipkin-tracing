@@ -27,7 +27,6 @@ trace {
     host = "localhost"
     port = 9410
     sampleRate = 0.1
-    mock = false
   }
 }
 
@@ -64,39 +63,18 @@ In the controller, trace action and calling another services as following:
 package controllers
 
 import play.api.mvc.{Action, Controller}
-import play.api.libs.ws.WSClient
-import jp.co.bizreach.trace.service.{TraceServiceLike, TracedFuture, Trace}
-import jp.co.bizreach.trace.play25.implicits.TraceImplicits._
-import scala.concurrent._
-import scala.concurrent.duration._
+import jp.co.bizreach.trace.play25.{TraceWSClient, ZipkinTraceService}
+import jp.co.bizreach.trace.play25.implicits.ZipkinTraceImplicits
+import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 
-class ApiController @Inject() (ws: WSClient)
-  (implicit val traceService: TraceServiceLike, val ec: ExecutionContext) 
-    extends Controller {
+class ApiController @Inject() (ws: TraceWSClient)
+  (implicit val tracer: ZipkinTraceServiceLike, val ec: ExecutionContext) 
+    extends Controller with ZipkinTraceImplicits {
 
-  // Trace sync action
-  def test1 = Action { implicit req =>
-    Trace("sync-call"){ implicit cassette =>
-      val f = ws.url("http://localhost:9992/api/hello")
-        .withTraceHeader() // Call withTraceHeader to set Zipkin headers
-        .get().map { res =>
-        Ok(res.json)
-      }
-      Await.result(f, Duration.Inf)
-    }
-  }
-
-  // Trace async action
-  def test2 = Action.async { implicit req =>
-    // Use TracedFuture instead of Future
-    TracedFuture("async-call"){ implicit cassette =>
-      ws.url("http://localhost:9992/api/hello")
-        .withTraceHeader() // Call withTraceHeader to set Zipkin headers
-        .get().map { res =>
-        Ok(res.json)
-      }
-    }
+  def test = Action.async { implicit req =>
+    ws.url("async-call", "http://localhost:9992/api/hello")
+      .get().map { res => Ok(res.json) }
   }
   
 }
