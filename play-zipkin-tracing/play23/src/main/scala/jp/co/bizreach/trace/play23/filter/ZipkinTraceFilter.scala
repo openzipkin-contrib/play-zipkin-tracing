@@ -15,21 +15,20 @@ class ZipkinTraceFilter extends Filter {
   private val reqHeaderToSpanName: RequestHeader => String = ZipkinTraceFilter.ParamAwareRequestNamer
 
   def apply(nextFilter: (RequestHeader) => Future[Result])(req: RequestHeader): Future[Result] = {
-    ZipkinTraceService.serverReceived(
-      traceName = reqHeaderToSpanName(req),
-      span      = ZipkinTraceService.toSpan(req.headers)((headers, key) => headers.get(key))
-    ).flatMap { serverSpan =>
-      val result = nextFilter(req.copy(headers = new Headers {
-        protected val data: Seq[(String, Seq[String])] = {
-          req.headers.toMap ++ ZipkinTraceService.toMap(serverSpan).map { case (key, value) => key -> Seq(value) }
-        }.toSeq
-      }))
-      result.onComplete {
-        case Failure(t) => ZipkinTraceService.serverSend(serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
-        case _ => ZipkinTraceService.serverSend(serverSpan)
-      }
-      result
+    val serverSpan = ZipkinTraceService.serverReceived(
+      spanName = reqHeaderToSpanName(req),
+      span = ZipkinTraceService.newSpan(req.headers)((headers, key) => headers.get(key))
+    )
+    val result = nextFilter(req.copy(headers = new Headers {
+      protected val data: Seq[(String, Seq[String])] = {
+        req.headers.toMap ++ ZipkinTraceService.toMap(serverSpan).map { case (key, value) => key -> Seq(value) }
+      }.toSeq
+    }))
+    result.onComplete {
+      case Failure(t) => ZipkinTraceService.serverSend(serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
+      case _ => ZipkinTraceService.serverSend(serverSpan)
     }
+    result
   }
 }
 

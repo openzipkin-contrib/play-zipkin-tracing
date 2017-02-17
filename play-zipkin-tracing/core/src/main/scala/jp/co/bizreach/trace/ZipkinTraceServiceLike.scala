@@ -1,8 +1,7 @@
-package jp.co.bizreach.trace.zipkin
+package jp.co.bizreach.trace
 
 import brave.propagation.Propagation
 import brave.{Span, Tracer}
-import jp.co.bizreach.trace.{TraceCassette, TraceService}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Failure
@@ -10,7 +9,7 @@ import scala.util.Failure
 /**
   * Created by nishiyama on 2016/12/08.
   */
-trait ZipkinTraceServiceLike extends TraceService {
+trait ZipkinTraceServiceLike {
 
   type ServerSpan = Span
 
@@ -18,22 +17,20 @@ trait ZipkinTraceServiceLike extends TraceService {
   val tracer: Tracer
 
 
-  def serverReceived[A](traceName: String, span: Span): Future[ServerSpan] = {
-    Future {
-      span.name(traceName).kind(Span.Kind.SERVER).start()
-    }
+  def serverReceived[A](spanName: String, span: Span): ServerSpan = {
+    span.name(spanName).kind(Span.Kind.SERVER).start()
   }
 
-  def serverSend(span: ServerSpan, tags: (String, String)*): Future[ServerSpan] = {
+  def serverSend(span: ServerSpan, tags: (String, String)*): ServerSpan = {
     Future {
       tags.foreach { case (key, value) => span.tag(key, value) }
       span.finish()
-      span
     }
+    span
   }
 
   // Request Headers => Span
-  def toSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
+  def newSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
     val contextOrFlags = Propagation.B3_STRING.extractor(new Propagation.Getter[A, String] {
       def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
     }).extract(headers)
@@ -54,39 +51,33 @@ trait ZipkinTraceServiceLike extends TraceService {
     data.toMap
   }
 
-  def toMap(cassette: TraceCassette): Map[String, String] = cassette match {
-    case zipkin: ZipkinTraceCassette => toMap(zipkin.span)
-    case _ => Map.empty
+  def toMap(traceData: TraceData): Map[String, String] = {
+    toMap(traceData.span)
   }
 
-  override def trace[A](traceName: String, tags: (String, String)*)(f: TraceCassette => A)(implicit parentCassette: TraceCassette): A = ???
+  // TODO implement this method!
+  def trace[A](traceName: String, tags: (String, String)*)(f: TraceData => A)(implicit parentData: TraceData): A = ???
 
-  override def traceFuture[A](traceName: String, tags: (String, String)*)(f: TraceCassette => Future[A])(implicit parentCassette: TraceCassette): Future[A] = {
-    parentCassette match {
-      case cassette: ZipkinTraceCassette =>
-        sample(traceName, cassette.span, tags: _*)(s => f(ZipkinTraceCassette(s)))
+  def traceFuture[A](traceName: String, tags: (String, String)*)(f: TraceData => Future[A])(implicit parentDate: TraceData): Future[A] = {
+    sample(traceName, parentDate.span, tags: _*)(s => f(TraceData(s)))
+  }
+
+  private[trace] def sample[A](name: String, parent: Span, tags: (String, String)*)(f: Span => Future[A]): Future[A] = {
+    val childSpan = tracer.newChild(parent.context()).name(name).kind(Span.Kind.CLIENT)
+    tags.foreach { case (key, value) => childSpan.tag(key, value) }
+    childSpan.start()
+
+    val result = f(childSpan)
+
+    result.onComplete {
+      case Failure(t) =>
+        childSpan.tag("failed", s"Finished with exception: ${t.getMessage}")
+        childSpan.finish()
       case _ =>
-        f(parentCassette)
+        childSpan.finish()
     }
-  }
 
-  private[zipkin] def sample[A](name: String, parent: Span, tags: (String, String)*)(f: Span => Future[A]): Future[A] = {
-    Future {
-      // start a new span representing a request
-      val childSpan = tracer.newChild(parent.context()).name(name).kind(Span.Kind.CLIENT)
-      tags.foreach { case (key, value) => childSpan.tag(key, value) }
-      childSpan.start()
-    }.flatMap { span =>
-      val result = f(span)
-      result.onComplete {
-        case Failure(t) =>
-          span.tag("failed", s"Finished with exception: ${t.getMessage}")
-          span.finish()
-        case _ =>
-          span.finish()
-      }
-      result
-    }
+    result
   }
 
 }

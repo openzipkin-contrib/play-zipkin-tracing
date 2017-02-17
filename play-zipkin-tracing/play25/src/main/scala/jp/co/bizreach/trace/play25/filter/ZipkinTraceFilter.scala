@@ -3,7 +3,7 @@ package jp.co.bizreach.trace.play25.filter
 import javax.inject.Inject
 
 import akka.stream.Materializer
-import jp.co.bizreach.trace.zipkin.ZipkinTraceServiceLike
+import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import play.api.mvc.{Filter, Headers, RequestHeader, Result}
 
 import scala.concurrent.Future
@@ -18,19 +18,18 @@ class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val 
   private val reqHeaderToSpanName: RequestHeader => String = ZipkinTraceFilter.ParamAwareRequestNamer
 
   def apply(nextFilter: (RequestHeader) => Future[Result])(req: RequestHeader): Future[Result] = {
-    tracer.serverReceived(
-      traceName = reqHeaderToSpanName(req),
-      span = tracer.toSpan(req.headers)((headers, key) => headers.get(key))
-    ).flatMap { serverSpan =>
-      val result = nextFilter(req.copy(headers = new Headers(
-        (req.headers.toMap.mapValues(_.headOption getOrElse "") ++ tracer.toMap(serverSpan)).toSeq
-      )))
-      result.onComplete {
-        case Failure(t) => tracer.serverSend(serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
-        case _ => tracer.serverSend(serverSpan)
-      }
-      result
+    val serverSpan = tracer.serverReceived(
+      spanName = reqHeaderToSpanName(req),
+      span = tracer.newSpan(req.headers)((headers, key) => headers.get(key))
+    )
+    val result = nextFilter(req.copy(headers = new Headers(
+      (req.headers.toMap.mapValues(_.headOption getOrElse "") ++ tracer.toMap(serverSpan)).toSeq
+    )))
+    result.onComplete {
+      case Failure(t) => tracer.serverSend(serverSpan, "failed" -> s"Finished with exception: ${t.getMessage}")
+      case _ => tracer.serverSend(serverSpan)
     }
+    result
   }
 }
 
