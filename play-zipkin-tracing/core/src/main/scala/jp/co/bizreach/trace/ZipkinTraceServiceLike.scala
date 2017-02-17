@@ -4,7 +4,7 @@ import brave.propagation.Propagation
 import brave.{Span, Tracer}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Failure
+import scala.util.{Success, Try, Failure}
 
 /**
   * Created by nishiyama on 2016/12/08.
@@ -55,15 +55,28 @@ trait ZipkinTraceServiceLike {
     toMap(traceData.span)
   }
 
-  // TODO implement this method!
-  def trace[A](traceName: String, tags: (String, String)*)(f: => A)(implicit parentData: TraceData): A = ???
+  def trace[A](traceName: String, tags: (String, String)*)(f: => A)(implicit parentData: TraceData): A = {
+    val childSpan = tracer.newChild(parentData.span.context()).name(traceName).kind(Span.Kind.CLIENT)
+    tags.foreach { case (key, value) => childSpan.tag(key, value) }
+    childSpan.start()
 
-  def traceFuture[A](traceName: String, tags: (String, String)*)(f: => Future[A])(implicit parentDate: TraceData): Future[A] = {
-    sample(traceName, parentDate.span, tags: _*)(f)
+    Try(f) match {
+      case Failure(t) =>
+        Future {
+          childSpan.tag("failed", s"Finished with exception: ${t.getMessage}")
+          childSpan.finish()
+        }
+        throw t
+      case Success(result) =>
+        Future {
+          childSpan.finish()
+        }
+        result
+    }
   }
 
-  private[trace] def sample[A](name: String, parent: Span, tags: (String, String)*)(f: => Future[A]): Future[A] = {
-    val childSpan = tracer.newChild(parent.context()).name(name).kind(Span.Kind.CLIENT)
+  def traceFuture[A](traceName: String, tags: (String, String)*)(f: => Future[A])(implicit parentData: TraceData): Future[A] = {
+    val childSpan = tracer.newChild(parentData.span.context()).name(traceName).kind(Span.Kind.CLIENT)
     tags.foreach { case (key, value) => childSpan.tag(key, value) }
     childSpan.start()
 
