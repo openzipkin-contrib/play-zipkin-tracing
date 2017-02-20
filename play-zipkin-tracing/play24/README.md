@@ -5,12 +5,14 @@ A library to add tracing capability to Play 2.5 based microservices.
 
 ## Setup
 
-Add following dependency to `build.sbt`:
+Add following configuration to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
   "jp.co.bizreach" %% "play-zipkin-tracing-play24" % "0.0.1-SNAPSHOT"
 )
+
+routesGenerator := InjectedRoutesGenerator
 ```
 
 Add following configuration to `application.conf`:
@@ -35,7 +37,7 @@ zipkin-trace-context {
   }
 }
 
-play.modules.enabled  += "jp.co.bizreach.trace.play25.module.ZipkinModule"
+play.modules.enabled  += "jp.co.bizreach.trace.play24.module.ZipkinModule"
 ```
 
 ## Usage
@@ -46,12 +48,14 @@ Inject `ZipkinTraceFilter` to `filter.Filters`:
 package filters
 
 import javax.inject.Inject
-import jp.co.bizreach.trace.play25.filter.ZipkinTraceFilter
-import play.api.http.DefaultHttpFilters
+import jp.co.bizreach.trace.play24.filter.ZipkinTraceFilter
+import play.api.http.HttpFilters
 
 class Filters @Inject() (
   zipkinTraceFilter: ZipkinTraceFilter
-) extends DefaultHttpFilters(zipkinTraceFilter)
+) extends HttpFilters {
+  val filters = Seq(zipkinTraceFilter)
+}
 ```
 
 In the controller, trace action and calling another services as following:
@@ -62,8 +66,8 @@ package controllers
 
 import play.api.mvc.{Action, Controller}
 import play.api.libs.json.Json
-import jp.co.bizreach.trace.play25.{TraceWSClient, ZipkinTraceService}
-import jp.co.bizreach.trace.play25.implicits.ZipkinTraceImplicits
+import jp.co.bizreach.trace.play24.{TraceWSClient, ZipkinTraceService}
+import jp.co.bizreach.trace.play24.implicits.ZipkinTraceImplicits
 import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 
