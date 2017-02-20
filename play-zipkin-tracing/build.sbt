@@ -8,7 +8,10 @@ val play25Version = "2.5.7"
 val play23Version = "2.3.10"
 
 lazy val root = (project in file(".")).
-  settings(publish := {}).
+  settings(
+    name := "play-zipkin-tracing",
+    publish := {}
+  ).
   aggregate(core, play25, play23)
 
 lazy val core = (project in file("core")).
