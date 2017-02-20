@@ -1,6 +1,6 @@
 package jp.co.bizreach.trace.play24.module
 
-import jp.co.bizreach.trace.play25.ZipkinTraceService
+import jp.co.bizreach.trace.play24.ZipkinTraceService
 import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module}

@@ -2,7 +2,6 @@ package jp.co.bizreach.trace.play24.filter
 
 import javax.inject.Inject
 
-import akka.stream.Materializer
 import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import play.api.mvc.{Filter, Headers, RequestHeader, Result}
 
@@ -21,9 +20,8 @@ import scala.util.Failure
  * }}}
  *
  * @param tracer a Zipkin tracer
- * @param mat a materializer
  */
-class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val mat: Materializer) extends Filter {
+class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike) extends Filter {
 
   import tracer.executionContext
   private val reqHeaderToSpanName: RequestHeader => String = ZipkinTraceFilter.ParamAwareRequestNamer
