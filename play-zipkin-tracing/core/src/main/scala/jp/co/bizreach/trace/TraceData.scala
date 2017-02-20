@@ -1,7 +1,8 @@
 package jp.co.bizreach.trace
 
 /**
-  * Created by nishiyama on 2016/12/08.
-  */
+ * Class for a trace data take over between requests.
+ * @param span the present span
+ */
 case class TraceData(span: brave.Span)
 

@@ -7,8 +7,15 @@ import scala.concurrent.Future
 import scala.util.Failure
 
 /**
-  * Created by nishiyama on 2016/12/09.
-  */
+ * A Zipkin filter.
+ *
+ * This filter is that reports how long a request takes to execute in Play as a server span.
+ * The way to use this filter is following:
+ * {{{
+ * object Global extends WithFilters(new ZipkinTraceFilter()) with GlobalSettings
+ * }}}
+ *
+ */
 class ZipkinTraceFilter extends Filter {
 
   import ZipkinTraceService.executionContext

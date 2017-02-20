@@ -11,8 +11,8 @@ import zipkin.reporter.okhttp3.OkHttpSender
 import scala.concurrent.ExecutionContext
 
 /**
-  * Created by nishiyama on 2016/12/09.
-  */
+ * Object for Zipkin tracing at Play2.3.
+ */
 object ZipkinTraceService extends ZipkinTraceServiceLike {
   import play.api.Play.current
   val conf: Configuration = Play.configuration

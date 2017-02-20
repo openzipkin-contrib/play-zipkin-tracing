@@ -6,8 +6,14 @@ import play.api.{Configuration, Environment}
 import play.api.inject.{Binding, Module}
 
 /**
-  * Created by nishiyama on 2016/12/08.
-  */
+ * A Zipkin module.
+ *
+ * This module can be registered with Play automatically by appending it in application.conf:
+ * {{{
+ *   play.modules.enabled += "jp.co.bizreach.trace.play25.module.ZipkinModule"
+ * }}}
+ *
+ */
 class ZipkinModule extends Module {
   override def bindings(environment: Environment, configuration: Configuration): Seq[Binding[_]] = {
     Seq(
