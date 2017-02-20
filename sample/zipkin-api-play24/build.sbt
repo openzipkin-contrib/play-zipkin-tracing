@@ -1,7 +1,7 @@
 import com.typesafe.sbt.SbtNativePackager._
 
 organization := "jp.co.bizreach"
-name := """zipkin-api-sample"""
+name := """zipkin-api-play24"""
 
 version := "1.0-SNAPSHOT"
 
@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play25" % "0.0.1-SNAPSHOT"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play24" % "0.0.1-SNAPSHOT"
 )
 
 
@@ -39,3 +39,5 @@ javacOptions in compile ++= Seq(
   "-source", "1.8",
   "-target", "1.8"
 )
+
+routesGenerator := InjectedRoutesGenerator

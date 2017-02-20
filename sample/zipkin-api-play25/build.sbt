@@ -1,6 +1,6 @@
 organization := "jp.co.bizreach"
 
-name := """zipkin-web-sample"""
+name := """zipkin-api-play25"""
 
 version := "1.0-SNAPSHOT"
 

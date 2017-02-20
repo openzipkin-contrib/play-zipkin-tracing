@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
-import jp.co.bizreach.trace.play25.{TraceWSClient, ZipkinTraceService}
-import jp.co.bizreach.trace.play25.implicits.ZipkinTraceImplicits
+import jp.co.bizreach.trace.play24.{TraceWSClient, ZipkinTraceService}
+import jp.co.bizreach.trace.play24.implicits.ZipkinTraceImplicits
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
