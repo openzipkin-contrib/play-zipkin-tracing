@@ -8,7 +8,6 @@ import play.api.libs.iteratee.Enumerator
 import play.api.libs.ws._
 
 import scala.concurrent.Future
-import scala.concurrent.duration.Duration
 
 /**
  * Inject this class instead of WSClient to trace service calling.
@@ -27,7 +26,7 @@ class TraceWSClient @Inject()(ws: WSClient, tracer: ZipkinTraceServiceLike) {
    * B3 headers are added to the generated request holder and tracing data is sent to the zipkin server automatically.
    */
   def url(spanName: String, url: String)(implicit traceData: TraceData): WSRequest = {
-    new TraceWSRequest(spanName, ws.url(url), tracer, traceData).withHeaders(tracer.toMap(traceData).toSeq: _*)
+    new TraceWSRequest(spanName, ws.url(url), tracer, traceData)
   }
 
   @scala.throws[IOException]
@@ -57,9 +56,13 @@ class TraceWSClient @Inject()(ws: WSClient, tracer: ZipkinTraceServiceLike) {
     override def withProxyServer(proxyServer: WSProxyServer): WSRequest = new TraceWSRequest(spanName, request.withProxyServer(proxyServer), tracer, traceData)
     override def withBody(body: WSBody): WSRequest = new TraceWSRequest(spanName, request.withBody(body), tracer, traceData)
     override def withMethod(method: String): WSRequest = new TraceWSRequest(spanName, request.withMethod(method), tracer, traceData)
-    override def execute(): Future[WSResponse] = tracer.traceFuture(spanName){ request.execute() }(traceData)
-    override def stream(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = tracer.traceFuture(spanName){ request.stream() }(traceData)
 
+    override def execute(): Future[WSResponse] = tracer.traceWSFuture(spanName, traceData){ span =>
+      request.withHeaders(tracer.toMap(span).toSeq: _*).execute()
+    }
+    override def stream(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = tracer.traceWSFuture(spanName, traceData){ span =>
+      request.withHeaders(tracer.toMap(span).toSeq: _*).stream()
+    }
   }
 }
 

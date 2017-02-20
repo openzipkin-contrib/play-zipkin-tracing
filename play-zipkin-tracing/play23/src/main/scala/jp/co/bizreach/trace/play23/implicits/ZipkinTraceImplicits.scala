@@ -14,7 +14,7 @@ trait ZipkinTraceImplicits {
    */
   implicit def request2trace(implicit req: RequestHeader): TraceData = {
     TraceData(
-      span = ZipkinTraceService.newSpan(req.headers)((headers, key) => headers.get(key))
+      span = ZipkinTraceService.toSpan(req.headers)((headers, key) => headers.get(key))
     )
   }
 

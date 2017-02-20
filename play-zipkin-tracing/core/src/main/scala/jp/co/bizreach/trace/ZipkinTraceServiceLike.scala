@@ -66,6 +66,20 @@ trait ZipkinTraceServiceLike {
   }
 
   /**
+   * TODO scaladoc
+   */
+  def toSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
+    val contextOrFlags = Propagation.B3_STRING.extractor(new Propagation.Getter[A, String] {
+      def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
+    }).extract(headers)
+
+    Option(contextOrFlags.context())
+      .map(tracer.joinSpan)
+      .getOrElse(tracer.newTrace(contextOrFlags.samplingFlags()))
+  }
+
+
+  /**
    * Creates a span from request headers. If there is no existing trace, creates a new trace.
    * Otherwise creates a new span within an existing trace.
    *
@@ -170,4 +184,23 @@ trait ZipkinTraceServiceLike {
     result
   }
 
+  /**
+   * TODO Scaladoc
+   */
+  def traceWSFuture[A](traceName: String, parentData: TraceData)(f: Span => Future[A]): Future[A] = {
+    val childSpan = tracer.newChild(parentData.span.context()).name(traceName).kind(Span.Kind.CLIENT)
+    childSpan.start()
+
+    val result = f(childSpan)
+
+    result.onComplete {
+      case Failure(t) =>
+        childSpan.tag("failed", s"Finished with exception: ${t.getMessage}")
+        childSpan.finish()
+      case _ =>
+        childSpan.finish()
+    }
+
+    result
+  }
 }
