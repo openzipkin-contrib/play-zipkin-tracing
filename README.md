@@ -13,4 +13,4 @@ Provides distributed tracing for Play Framework using [Zipkin](http://zipkin.io/
 
 - [zipkin-api-play23](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play23)
 - [zipkin-api-play24](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play24)
-- [zipkin-web-play25](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play25)
+- [zipkin-api-play25](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play25)
