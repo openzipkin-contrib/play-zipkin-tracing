@@ -43,10 +43,10 @@ object TraceWS {
     override def withProxyServer(proxyServer: WSProxyServer): WSRequestHolder = new TraceWSRequest(spanName, request.withProxyServer(proxyServer), traceData)
     override def withBody(body: WSBody): WSRequestHolder = new TraceWSRequest(spanName, request.withBody(body), traceData)
     override def withMethod(method: String): WSRequestHolder = new TraceWSRequest(spanName, request.withMethod(method), traceData)
-    override def execute(): Future[Response] = ZipkinTraceService.traceWSFuture(spanName, traceData){ span =>
+    override def execute(): Future[Response] = ZipkinTraceService.traceWS(spanName, traceData){ span =>
       request.withHeaders(ZipkinTraceService.toMap(span).toSeq:_*).execute()
     }
-    override def stream(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = ZipkinTraceService.traceWSFuture(spanName, traceData){ span =>
+    override def stream(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = ZipkinTraceService.traceWS(spanName, traceData){ span =>
       request.withHeaders(ZipkinTraceService.toMap(span).toSeq:_*).stream()
     }
   }

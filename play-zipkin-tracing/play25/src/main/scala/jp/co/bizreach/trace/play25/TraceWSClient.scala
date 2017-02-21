@@ -59,14 +59,14 @@ class TraceWSClient @Inject()(ws: WSClient, tracer: ZipkinTraceServiceLike) {
     override def withBody(body: WSBody): WSRequest = new TraceWSRequest(spanName, request.withBody(body), tracer, traceData)
     override def withMethod(method: String): WSRequest = new TraceWSRequest(spanName, request.withMethod(method), tracer, traceData)
 
-    override def execute(): Future[WSResponse] = tracer.traceWSFuture(spanName, traceData){ span =>
+    override def execute(): Future[WSResponse] = tracer.traceWS(spanName, traceData){ span =>
       request.withHeaders(tracer.toMap(span).toSeq: _*).execute()
     }
-    override def stream(): Future[StreamedResponse] = tracer.traceWSFuture(spanName, traceData){ span =>
+    override def stream(): Future[StreamedResponse] = tracer.traceWS(spanName, traceData){ span =>
       request.withHeaders(tracer.toMap(span).toSeq: _*).stream()
     }
     @scala.deprecated("Use `WS.stream()` instead.")
-    override def streamWithEnumerator(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = tracer.traceWSFuture(spanName, traceData){ span =>
+    override def streamWithEnumerator(): Future[(WSResponseHeaders, Enumerator[Array[Byte]])] = tracer.traceWS(spanName, traceData){ span =>
       request.withHeaders(tracer.toMap(span).toSeq: _*).streamWithEnumerator()
     }
   }

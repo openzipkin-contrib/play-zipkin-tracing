@@ -13,7 +13,7 @@ import zipkin.reporter.okhttp3.OkHttpSender
 import scala.concurrent.ExecutionContext
 
 /**
- * Class for Zipkin tracing at Play2.5.
+ * Class for Zipkin tracing at Play2.4.
  *
  * @param conf a Play's configuration
  * @param actorSystem a Play's actor system

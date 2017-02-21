@@ -40,91 +40,6 @@ trait ZipkinTraceServiceLike {
   val tracer: Tracer
 
   /**
-   * Starts the server span. When a server received event has occurred, calling this.
-   *
-   * @param spanName the string name for this span
-   * @param span the span to start
-   * @return the server span that will later signal to the Zipkin
-   */
-  def serverReceived(spanName: String, span: Span): ServerSpan = {
-    span.name(spanName).kind(Span.Kind.SERVER).start()
-  }
-
-  /**
-   * Reports the server span complete. When a server sent event has occurred, calling this.
-   *
-   * @param span the server span to report
-   * @param tags tags to add to the span
-   * @return the server span itself
-   */
-  def serverSend(span: ServerSpan, tags: (String, String)*): ServerSpan = {
-    Future {
-      tags.foreach { case (key, value) => span.tag(key, value) }
-      span.finish()
-    }
-    span
-  }
-
-  /**
-   * TODO scaladoc
-   */
-  def toSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
-    val contextOrFlags = Propagation.B3_STRING.extractor(new Propagation.Getter[A, String] {
-      def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
-    }).extract(headers)
-
-    Option(contextOrFlags.context())
-      .map(tracer.joinSpan)
-      .getOrElse(tracer.newTrace(contextOrFlags.samplingFlags()))
-  }
-
-
-  /**
-   * Creates a span from request headers. If there is no existing trace, creates a new trace.
-   * Otherwise creates a new span within an existing trace.
-   *
-   * @param headers the HTTP headers
-   * @param getHeader optionally returns the first header value associated with a key
-   * @tparam A the HTTP headers type
-   * @return a new span created from request headers
-   */
-  def newSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
-    val contextOrFlags = Propagation.B3_STRING.extractor(new Propagation.Getter[A, String] {
-      def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
-    }).extract(headers)
-
-    Option(contextOrFlags.context())
-      .map(tracer.newChild)
-      .getOrElse(tracer.newTrace(contextOrFlags.samplingFlags()))
-  }
-
-  /**
-   * Transform the span to a request header's Map.
-   *
-   * @param span the span
-   * @return a Map transformed the span
-   */
-  def toMap(span: Span): Map[String, String] = {
-    val data = collection.mutable.Map[String, String]()
-
-    Propagation.B3_STRING.injector(new Propagation.Setter[collection.mutable.Map[String, String], String] {
-      def put(carrier: collection.mutable.Map[String, String], key: String, value: String): Unit = carrier += key -> value
-    }).inject(span.context(), data)
-
-    data.toMap
-  }
-
-  /**
-   * Transform the trace data to a request header's Map.
-   *
-   * @param traceData the trace data
-   * @return a Map transformed the trace data
-   */
-  def toMap(traceData: TraceData): Map[String, String] = {
-    toMap(traceData.span)
-  }
-
-  /**
    * Creates a new client span within an existing trace and reports the span complete.
    * When an `Action` that returns a result, calling this.
    *
@@ -185,9 +100,10 @@ trait ZipkinTraceServiceLike {
   }
 
   /**
-   * TODO Scaladoc
+   * Creates a new client span within an existing trace and reports the span complete.
+   * This method is used to trace WS request automatically.
    */
-  def traceWSFuture[A](traceName: String, parentData: TraceData)(f: Span => Future[A]): Future[A] = {
+  private[trace] def traceWS[A](traceName: String, parentData: TraceData)(f: Span => Future[A]): Future[A] = {
     val childSpan = tracer.newChild(parentData.span.context()).name(traceName).kind(Span.Kind.CLIENT)
     childSpan.start()
 
@@ -203,4 +119,93 @@ trait ZipkinTraceServiceLike {
 
     result
   }
+
+  /**
+   * Starts the server span. When a server received event has occurred, calling this.
+   *
+   * @param spanName the string name for this span
+   * @param span the span to start
+   * @return the server span that will later signal to the Zipkin
+   */
+  private[trace] def serverReceived(spanName: String, span: Span): ServerSpan = {
+    span.name(spanName).kind(Span.Kind.SERVER).start()
+  }
+
+  /**
+   * Reports the server span complete. When a server sent event has occurred, calling this.
+   *
+   * @param span the server span to report
+   * @param tags tags to add to the span
+   * @return the server span itself
+   */
+  private[trace] def serverSend(span: ServerSpan, tags: (String, String)*): ServerSpan = {
+    Future {
+      tags.foreach { case (key, value) => span.tag(key, value) }
+      span.finish()
+    }
+    span
+  }
+
+  /**
+   * Creates a span from request headers. If there is no existing trace, creates a new trace.
+   * Otherwise creates a new span within an existing trace.
+   *
+   * @param headers the HTTP headers
+   * @param getHeader optionally returns the first header value associated with a key
+   * @tparam A the HTTP headers type
+   * @return a new span created from request headers
+   */
+  private[trace] def newSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
+    val contextOrFlags = Propagation.B3_STRING.extractor(new Propagation.Getter[A, String] {
+      def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
+    }).extract(headers)
+
+    Option(contextOrFlags.context())
+      .map(tracer.newChild)
+      .getOrElse(tracer.newTrace(contextOrFlags.samplingFlags()))
+  }
+
+  /**
+   * Transform request headers to the span. This method is reusing
+   * the ids extracted from an incoming request.
+   *
+   * @param headers the HTTP headers
+   * @param getHeader optionally returns the first header value associated with a key
+   * @tparam A the HTTP headers type
+   * @return a span extracted from request headers
+   */
+  private[trace] def toSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
+    val contextOrFlags = Propagation.B3_STRING.extractor(new Propagation.Getter[A, String] {
+      def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
+    }).extract(headers)
+
+    tracer.joinSpan(contextOrFlags.context())
+  }
+
+  /**
+   * Transform the span to a request header's Map.
+   *
+   * @param span the span
+   * @return a Map transformed the span
+   */
+  private[trace] def toMap(span: Span): Map[String, String] = {
+    val data = collection.mutable.Map[String, String]()
+
+    Propagation.B3_STRING.injector(new Propagation.Setter[collection.mutable.Map[String, String], String] {
+      def put(carrier: collection.mutable.Map[String, String], key: String, value: String): Unit = carrier += key -> value
+    }).inject(span.context(), data)
+
+    data.toMap
+  }
+
+  /**
+   * Transform the trace data to a request header's Map.
+   *
+   * @param traceData the trace data
+   * @return a Map transformed the trace data
+   */
+  private[trace] def toMap(traceData: TraceData): Map[String, String] = {
+    toMap(traceData.span)
+  }
+
 }
