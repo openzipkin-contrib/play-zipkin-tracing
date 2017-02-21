@@ -1,7 +1,7 @@
-play-zipkin-tracing-play25
+play-zipkin-tracing-play24
 ========
 
-A library to add tracing capability to Play 2.5 based microservices.
+A library to add tracing capability to Play 2.4 based microservices.
 
 ## Setup
 
@@ -9,7 +9,7 @@ Add following configuration to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play24" % "0.0.1-SNAPSHOT"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play24" % "1.0.0"
 )
 
 routesGenerator := InjectedRoutesGenerator

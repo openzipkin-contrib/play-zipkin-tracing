@@ -1,7 +1,44 @@
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
-  version := "0.0.1-SNAPSHOT",
-  scalaVersion := "2.11.8"
+  version := "1.0.0",
+  scalaVersion := "2.11.8",
+  publishMavenStyle := true,
+  publishTo := {
+    val nexus = "https://oss.sonatype.org/"
+    if (version.value.trim.endsWith("SNAPSHOT"))
+      Some("snapshots" at nexus + "content/repositories/snapshots")
+    else
+      Some("releases"  at nexus + "service/local/staging/deploy/maven2")
+  },
+  publishArtifact in Test := false,
+  pomIncludeRepository := { _ => false },
+  pomExtra := (
+    <url>https://github.com/bizreach/play-zipkin-tracing</url>
+    <licenses>
+      <license>
+        <name>The Apache Software License, Version 2.0</name>
+        <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      </license>
+    </licenses>
+    <scm>
+      <url>https://github.com/bizreach/play-zipkin-tracing</url>
+      <connection>scm:git:https://github.com/bizreach/play-zipkin-tracing.git</connection>
+    </scm>
+    <developers>
+      <developer>
+        <id>nishiyama</id>
+        <name>Hajime Nishiyama</name>
+      </developer>
+      <developer>
+        <id>shimamoto</id>
+        <name>Takako Shimamoto</name>
+      </developer>
+      <developer>
+        <id>takezoe</id>
+        <name>Naoki Takezoe</name>
+      </developer>
+    </developers>
+  )
 )
 
 val play25Version = "2.5.7"
@@ -9,9 +46,10 @@ val play24Version = "2.4.8"
 val play23Version = "2.3.10"
 
 lazy val root = (project in file(".")).
+  settings(commonSettings: _*).
   settings(
     name := "play-zipkin-tracing",
-    publish := {}
+    publishArtifact := false
   ).
   aggregate(core, play25, play24, play23)
 
