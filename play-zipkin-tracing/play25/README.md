@@ -23,7 +23,7 @@ trace {
 
   zipkin {
     host = "localhost"
-    port = 9410
+    port = 9411
     sample-rate = 0.1
   }
 }
