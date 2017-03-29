@@ -22,7 +22,7 @@ import scala.util.{Success, Try, Failure}
  *   val tracer = Tracer.newBuilder()
  *     .localServiceName("example")
  *     .reporter(AsyncReporter
- *       .builder(OkHttpSender.create("http://localhost:9410/api/v1/spans"))
+ *       .builder(OkHttpSender.create("http://localhost:9411/api/v1/spans"))
  *       .build()
  *     )
  *     .sampler(Sampler.create(0.1F))
