@@ -20,7 +20,7 @@ object ZipkinTraceService extends ZipkinTraceServiceLike {
   implicit val executionContext: ExecutionContext = Akka.system.dispatchers.lookup(ZipkinTraceConfig.AkkaName)
 
   val tracer = Tracer.newBuilder()
-    .localServiceName(conf.getString(ZipkinTraceConfig.ServiceName) getOrElse "example")
+    .localServiceName(conf.getString(ZipkinTraceConfig.ServiceName) getOrElse "unknown")
     .reporter(AsyncReporter
       .builder(OkHttpSender.create(
         s"http://${conf.getString(ZipkinTraceConfig.ZipkinHost) getOrElse "localhost"}:${conf.getInt(ZipkinTraceConfig.ZipkinPort) getOrElse 9411}/api/v1/spans"
