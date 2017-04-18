@@ -40,7 +40,7 @@ Provides distributed tracing for Play Framework using [Zipkin](http://zipkin.io/
 4. Hit http://localhost:9991/nest in some way
 
   ```
-  $ curl -XGET http://localhost:9991/nest
+  $ curl http://localhost:9991/nest
   ```
 
 Then you can see traced data on Zipkin UI (http://localhost:9411) as:
