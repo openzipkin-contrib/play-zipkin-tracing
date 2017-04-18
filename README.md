@@ -15,6 +15,8 @@ Provides distributed tracing for Play Framework using [Zipkin](http://zipkin.io/
 - [zipkin-api-play24](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play24)
 - [zipkin-api-play25](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play25)
 
+### How to run sample projects
+
 1. Run zipkin-api-play25 project
 
   ```
@@ -35,12 +37,12 @@ Provides distributed tracing for Play Framework using [Zipkin](http://zipkin.io/
   $ java -jar zipkin.jar
   ```
 
-4. Hit http://localhost:9991/nest
+4. Hit http://localhost:9991/nest in some way
 
   ```
   $ curl -XGET http://localhost:9991/nest
   ```
 
-Then you can see traced data at Zipkin UI (http://localhost:9411) as:
+Then you can see traced data on Zipkin UI (http://localhost:9411) as:
 
 ![sample](sample.png)
