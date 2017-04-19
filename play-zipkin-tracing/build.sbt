@@ -60,7 +60,8 @@ lazy val core = (project in file("core")).
     libraryDependencies ++= Seq(
       "commons-lang" % "commons-lang" % "2.6",
       "io.zipkin.brave" % "brave" % "4.0.6",
-      "io.zipkin.reporter" % "zipkin-sender-okhttp3" % "0.6.12"
+      "io.zipkin.reporter" % "zipkin-sender-okhttp3" % "0.6.12",
+      "org.scalatest" %% "scalatest" % "3.0.2" % "test"
     )
   )
 
