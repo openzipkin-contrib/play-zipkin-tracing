@@ -73,7 +73,7 @@ class ApiController @Inject() (ws: TraceWSClient)
 
   // Trace blocking action
   def test1 = Action { implicit request =>
-    tracer.trace("sync"){
+    tracer.trace("sync"){ implicit traceData =>
       println("Hello World!")
       Ok(Json.obj("result" -> "ok"))
     }
@@ -81,7 +81,7 @@ class ApiController @Inject() (ws: TraceWSClient)
 
   // Trace async action
   def test2 = Action.async { implicit request =>
-    tracer.traceFuture("async"){
+    tracer.traceFuture("async"){ implicit traceData =>
       Future {
         println("Hello World!")
         Ok(Json.obj("result" -> "ok"))
