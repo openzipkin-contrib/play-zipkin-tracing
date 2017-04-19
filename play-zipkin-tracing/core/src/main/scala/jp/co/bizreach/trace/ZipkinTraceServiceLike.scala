@@ -57,15 +57,11 @@ trait ZipkinTraceServiceLike {
 
     Try(f) match {
       case Failure(t) =>
-        Future {
-          childSpan.tag("failed", s"Finished with exception: ${t.getMessage}")
-          childSpan.finish()
-        }
+        childSpan.tag("failed", s"Finished with exception: ${t.getMessage}")
+        childSpan.finish()
         throw t
       case Success(result) =>
-        Future {
-          childSpan.finish()
-        }
+        childSpan.finish()
         result
     }
   }
@@ -139,10 +135,8 @@ trait ZipkinTraceServiceLike {
    * @return the server span itself
    */
   private[trace] def serverSend(span: ServerSpan, tags: (String, String)*): ServerSpan = {
-    Future {
-      tags.foreach { case (key, value) => span.tag(key, value) }
-      span.finish()
-    }
+    tags.foreach { case (key, value) => span.tag(key, value) }
+    span.finish()
     span
   }
 
