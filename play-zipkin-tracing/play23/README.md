@@ -63,7 +63,7 @@ class ApiController extends Controller with ZipkinTraceImplicits {
 
   // Trace blocking action
   def test1 = Action { implicit request =>
-    ZipkinTraceService.trace("sync"){
+    ZipkinTraceService.trace("sync"){ implicit traceData =>
       println("Hello World!")
       Ok(Json.obj("result" -> "ok"))
     }
@@ -71,7 +71,7 @@ class ApiController extends Controller with ZipkinTraceImplicits {
 
   // Trace async action
   def test2 = Action.async { implicit request =>
-    ZipkinTraceService.traceFuture("async"){
+    ZipkinTraceService.traceFuture("async"){ implicit traceData =>
       Future {
         println("Hello World!")
         Ok(Json.obj("result" -> "ok"))

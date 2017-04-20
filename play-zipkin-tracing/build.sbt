@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
-  version := "1.0.0",
+  version := "1.1.0-SNAPSHOT",
   scalaVersion := "2.11.8",
   publishMavenStyle := true,
   publishTo := {
@@ -60,7 +60,8 @@ lazy val core = (project in file("core")).
     libraryDependencies ++= Seq(
       "commons-lang" % "commons-lang" % "2.6",
       "io.zipkin.brave" % "brave" % "4.0.6",
-      "io.zipkin.reporter" % "zipkin-sender-okhttp3" % "0.6.12"
+      "io.zipkin.reporter" % "zipkin-sender-okhttp3" % "0.6.12",
+      "org.scalatest" %% "scalatest" % "3.0.2" % "test"
     )
   )
 
@@ -92,5 +93,6 @@ lazy val play23 = (project in file("play23")).
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play" % play23Version % Provided,
       "com.typesafe.play" %% "play-ws" % play23Version % Provided
-    )
+    ),
+    resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
   ).dependsOn(core % "test->test;compile->compile")

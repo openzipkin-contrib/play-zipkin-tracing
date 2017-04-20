@@ -1,4 +1,4 @@
-play-zipkin-tracing
+play-zipkin-tracing [![Build Status](https://travis-ci.org/bizreach/play-zipkin-tracing.svg?branch=master)](https://travis-ci.org/bizreach/play-zipkin-tracing)
 ========
 
 Provides distributed tracing for Play Framework using [Zipkin](http://zipkin.io/). It makes possible to trace HTTP calls between Play based microservices easily without performance degradation.
