@@ -67,8 +67,9 @@ import jp.co.bizreach.trace.play25.implicits.ZipkinTraceImplicits
 import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 
-class ApiController @Inject() (ws: TraceWSClient)
-  (implicit val tracer: ZipkinTraceServiceLike, val ec: ExecutionContext)
+class ApiController @Inject()
+  (ws: TraceWSClient, val tracer: ZipkinTraceServiceLike)
+  (implicit val ec: ExecutionContext)
     extends Controller with ZipkinTraceImplicits {
 
   // Trace blocking action
