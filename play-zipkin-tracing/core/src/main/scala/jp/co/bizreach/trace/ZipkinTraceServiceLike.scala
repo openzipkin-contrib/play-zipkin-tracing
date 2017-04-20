@@ -50,12 +50,12 @@ trait ZipkinTraceServiceLike {
    * @tparam A return type of the function to trace
    * @return result of invoking the function
    */
-  def trace[A](traceName: String, tags: (String, String)*)(f: => A)(implicit parentData: TraceData): A = {
+  def trace[A](traceName: String, tags: (String, String)*)(f: TraceData => A)(implicit parentData: TraceData): A = {
     val childSpan = tracer.newChild(parentData.span.context()).name(traceName).kind(Span.Kind.CLIENT)
     tags.foreach { case (key, value) => childSpan.tag(key, value) }
     childSpan.start()
 
-    Try(f) match {
+    Try(f(TraceData(childSpan))) match {
       case Failure(t) =>
         Future {
           childSpan.tag("failed", s"Finished with exception: ${t.getMessage}")
@@ -81,12 +81,12 @@ trait ZipkinTraceServiceLike {
    * @tparam A return type of the function to trace
    * @return result of invoking the function
    */
-  def traceFuture[A](traceName: String, tags: (String, String)*)(f: => Future[A])(implicit parentData: TraceData): Future[A] = {
+  def traceFuture[A](traceName: String, tags: (String, String)*)(f: TraceData => Future[A])(implicit parentData: TraceData): Future[A] = {
     val childSpan = tracer.newChild(parentData.span.context()).name(traceName).kind(Span.Kind.CLIENT)
     tags.foreach { case (key, value) => childSpan.tag(key, value) }
     childSpan.start()
 
-    val result = f
+    val result = f(TraceData(childSpan))
 
     result.onComplete {
       case Failure(t) =>

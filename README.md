@@ -3,14 +3,46 @@ play-zipkin-tracing
 
 Provides distributed tracing for Play Framework using [Zipkin](http://zipkin.io/). It makes possible to trace HTTP calls between Play based microservices easily without performance degradation.
 
-### Supported versions
+## Supported versions
 
 - [Play 2.3](play-zipkin-tracing/play23/README.md)
 - [Play 2.4](play-zipkin-tracing/play24/README.md)
 - [Play 2.5](play-zipkin-tracing/play25/README.md)
 
-### Sample projects
+## Sample projects
 
 - [zipkin-api-play23](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play23)
 - [zipkin-api-play24](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play24)
 - [zipkin-api-play25](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play25)
+
+### How to run sample projects
+
+1. Run zipkin-api-play25 project
+
+  ```
+  $ cd sample/zipkin-api-play25
+  $ sbt run
+  ```
+
+2. Run zipkin-api-play24 project
+
+  ```
+  $ cd sample/zipkin-api-play24
+  $ sbt run
+  ```
+
+3. Run Zipkin UI
+
+  ```
+  $ java -jar zipkin.jar
+  ```
+
+4. Hit http://localhost:9991/nest in some way
+
+  ```
+  $ curl http://localhost:9991/nest
+  ```
+
+Then you can see traced data on Zipkin UI (http://localhost:9411) as:
+
+![sample](sample.png)
