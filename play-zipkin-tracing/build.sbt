@@ -93,5 +93,6 @@ lazy val play23 = (project in file("play23")).
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play" % play23Version % Provided,
       "com.typesafe.play" %% "play-ws" % play23Version % Provided
-    )
+    ),
+    resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
   ).dependsOn(core % "test->test;compile->compile")
