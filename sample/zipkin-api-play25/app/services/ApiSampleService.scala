@@ -17,9 +17,11 @@ class ApiSampleService @Inject() (
 ) {
 
   def sample(url: String)(implicit traceData: TraceData): Future[String] = {
-    tracer.trace("local-wait"){
-      Thread.sleep(300 + Random.nextInt(700))
+    tracer.trace("local-wait-1"){ implicit traceData =>
+      tracer.trace("local-wait-2"){ implicit traceData =>
+        Thread.sleep(300 + Random.nextInt(700))
+      }
+      repo.call(url)
     }
-    repo.call(url)
   }
 }

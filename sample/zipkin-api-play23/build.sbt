@@ -16,7 +16,7 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play23" % "1.0.0"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play23" % "1.1.0-SNAPSHOT"
 )
 
 
