@@ -1,6 +1,7 @@
 package jp.co.bizreach.trace
 
 import brave.Tracer
+import brave.internal.HexCodec
 import org.scalatest.FunSuite
 import zipkin.Span
 import zipkin.reporter.Reporter
@@ -13,8 +14,10 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 class ZipkinTraceServiceLikeSpec extends FunSuite {
 
   private def initialTraceData(tracer: ZipkinTraceServiceLike, header: Map[String, String]): TraceData = {
-    TraceData(tracer.newSpan[Map[String, String]](header)((headers: Map[String, String], key: String) => headers.get(key)))
+    TraceData(tracer.newSpan[Map[String, String]](header)(getValueFromMap _))
   }
+
+  private def getValueFromMap(map: Map[String, String], key: String): Option[String] = map.get(key)
 
   test("Nested local synchronous tracing"){
     val tracer = new TestZipkinTraceService()
@@ -63,6 +66,43 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
     assert(parent.duration > child.duration)
   }
 
+  test("Create span") {
+    val tracer = new TestZipkinTraceService()
+
+    // create root span
+    val parent = tracer.newSpan[Map[String, String]](Map.empty)(getValueFromMap _)
+    assert(parent.context().parentId() == null)
+
+    // create child span
+    val child = tracer.newSpan[Map[String, String]](Map(
+      "X-B3-TraceId" -> HexCodec.toLowerHex(parent.context().traceId()),
+      "X-B3-SpanId"  -> HexCodec.toLowerHex(parent.context().spanId())
+    ))(getValueFromMap _)
+
+    assert(child.context().traceId() == parent.context().traceId())
+    assert(child.context().parentId() == parent.context().spanId())
+    assert(child.context().spanId() != parent.context().spanId())
+  }
+
+  test("Receive and send server span") {
+    val tracer = new TestZipkinTraceService()
+
+    // create root span
+    val span = tracer.newSpan[Map[String, String]](Map.empty)(getValueFromMap _)
+
+    tracer.serverReceived("server-span", span)
+    Thread.sleep(500)
+    tracer.serverSend(span, "tag" -> "value")
+
+    assert(tracer.reporter.spans.length == 1)
+
+    val reported = tracer.reporter.spans.find(_.name == "server-span").get
+    assert(reported.name == "server-span")
+    assert(reported.duration >= 500)
+    assert(reported.binaryAnnotations.size() == 1)
+    assert(reported.binaryAnnotations.get(0).key == "tag")
+    assert(reported.binaryAnnotations.get(0).value === "value".getBytes())
+  }
 
 }
 
