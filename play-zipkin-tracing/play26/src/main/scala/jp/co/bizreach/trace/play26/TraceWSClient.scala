@@ -57,7 +57,9 @@ private class TraceWSRequest(spanName: String, request: WSRequest, tracer: Zipki
 
   override def sign(calc: WSSignatureCalculator): TraceWSRequest = new TraceWSRequest(spanName, request.sign(calc), tracer, traceData)
   override def withAuth(username: String, password: String, scheme: WSAuthScheme): TraceWSRequest = new TraceWSRequest(spanName, request.withAuth(username, password, scheme), tracer, traceData)
+  @deprecated("Use withHttpHeaders or addHttpHeaders", "1.0.0")
   override def withHeaders(hdrs: (String, String)*): TraceWSRequest = new TraceWSRequest(spanName, request.withHeaders(hdrs:_*), tracer, traceData)
+  @deprecated("Use withQueryStringParameters or addQueryStringParameter", "1.0.0")
   override def withQueryString(parameters: (String, String)*): TraceWSRequest = new TraceWSRequest(spanName, request.withQueryString(parameters:_*), tracer, traceData)
   override def withFollowRedirects(follow: Boolean): TraceWSRequest = new TraceWSRequest(spanName, request.withFollowRedirects(follow), tracer, traceData)
   override def withRequestTimeout(timeout: Duration): TraceWSRequest = new TraceWSRequest(spanName, request.withRequestTimeout(timeout), tracer, traceData)
@@ -99,5 +101,9 @@ private class TraceWSRequest(spanName: String, request: WSRequest, tracer: Zipki
   override def options(): Future[WSResponse] = execute("OPTIONS")
   override def execute(method: String): Future[WSResponse] = withMethod(method).execute()
 
+  override def cookies: Seq[WSCookie] = request.cookies
+  override def withHttpHeaders(headers: (String, String)*): TraceWSRequest = new TraceWSRequest(spanName, request.withHttpHeaders(headers:_*), tracer, traceData)
+  override def withQueryStringParameters(parameters: (String, String)*): TraceWSRequest = new TraceWSRequest(spanName, request.withQueryStringParameters(parameters:_*), tracer, traceData)
+  override def withCookies(cookies: WSCookie*): TraceWSRequest = new TraceWSRequest(spanName, request.withCookies(cookies:_*), tracer, traceData)
 }
 

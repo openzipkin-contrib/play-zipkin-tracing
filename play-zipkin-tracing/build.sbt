@@ -41,7 +41,7 @@ lazy val commonSettings = Seq(
   )
 )
 
-val play26Version = "2.6.0-M4"
+val play26Version = "2.6.0-RC1"
 val play25Version = "2.5.7"
 val play24Version = "2.4.8"
 val play23Version = "2.3.10"
