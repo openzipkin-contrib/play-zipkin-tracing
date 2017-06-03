@@ -41,6 +41,7 @@ lazy val commonSettings = Seq(
   )
 )
 
+val play26Version = "2.6.0-RC1"
 val play25Version = "2.5.7"
 val play24Version = "2.4.8"
 val play23Version = "2.3.10"
@@ -51,7 +52,7 @@ lazy val root = (project in file(".")).
     name := "play-zipkin-tracing",
     publishArtifact := false
   ).
-  aggregate(core, play25, play24, play23)
+  aggregate(core, play26, play25, play24, play23)
 
 lazy val core = (project in file("core")).
   settings(commonSettings: _*).
@@ -64,6 +65,16 @@ lazy val core = (project in file("core")).
       "org.scalatest" %% "scalatest" % "3.0.2" % "test"
     )
   )
+
+lazy val play26 = (project in file("play26")).
+  settings(commonSettings: _*).
+  settings(
+    name := "play-zipkin-tracing-play26",
+    libraryDependencies ++= Seq(
+      "com.typesafe.play" %% "play" % play26Version % Provided,
+      "com.typesafe.play" %% "play-ws" % play26Version % Provided
+    )
+  ).dependsOn(core % "test->test;compile->compile")
 
 lazy val play25 = (project in file("play25")).
   settings(commonSettings: _*).

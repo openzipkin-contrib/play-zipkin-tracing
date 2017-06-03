@@ -1,11 +1,11 @@
-package jp.co.bizreach.trace.play25
+package jp.co.bizreach.trace.play26
 
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
 import brave.Tracer
 import brave.sampler.Sampler
-import jp.co.bizreach.trace.{ZipkinTraceServiceLike, ZipkinTraceConfig}
+import jp.co.bizreach.trace.{ZipkinTraceConfig, ZipkinTraceServiceLike}
 import play.api.Configuration
 import zipkin.reporter.AsyncReporter
 import zipkin.reporter.okhttp3.OkHttpSender
