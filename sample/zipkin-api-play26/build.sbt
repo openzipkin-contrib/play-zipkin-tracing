@@ -11,10 +11,14 @@ scalaVersion := "2.11.8"
 libraryDependencies ++= Seq(
   jdbc,
   cache,
-  ws
+  ws,
+  guice
 )
 
 val AkkaVersion = "2.4.11"
+
+// TODO temporary
+resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 
 libraryDependencies ++= Seq(
   "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.1.0"
