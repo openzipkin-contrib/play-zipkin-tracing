@@ -10,7 +10,7 @@ import play.api.{Configuration, Environment}
  *
  * This module can be registered with Play automatically by appending it in application.conf:
  * {{{
- *   play.modules.enabled += "jp.co.bizreach.trace.play25.module.ZipkinModule"
+ *   play.modules.enabled += "jp.co.bizreach.trace.play26.module.ZipkinModule"
  * }}}
  *
  */

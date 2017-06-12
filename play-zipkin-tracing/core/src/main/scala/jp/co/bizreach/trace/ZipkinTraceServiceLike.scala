@@ -1,7 +1,7 @@
 package jp.co.bizreach.trace
 
 import brave.propagation.Propagation
-import brave.{Span, Tracer}
+import brave.{Span, Tracer, Tracing}
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Success, Try, Failure}
@@ -9,7 +9,7 @@ import scala.util.{Success, Try, Failure}
 /**
  * Basic trait for Zipkin tracing at Play.
  *
- * You need a Tracer and an ExecutionContext used by a tracer report data.
+ * You need a Tracing and an ExecutionContext used by a tracer report data.
  * Here's an example setup that sends trace data to Zipkin over http.
  * {{{
  * class ZipkinTraceService @Inject() (
@@ -18,8 +18,8 @@ import scala.util.{Success, Try, Failure}
  *   // the execution context provided by and used for tracing purposes
  *   implicit val executionContext: ExecutionContext = actorSystem.dispatchers.lookup("zipkin-trace-context")
  *
- *   // configure a reporter, now create a tracer
- *   val tracer = Tracer.newBuilder()
+ *   // configure a reporter, now create a tracing component
+ *   val tracing = Tracing.newBuilder()
  *     .localServiceName("example")
  *     .reporter(AsyncReporter
  *       .builder(OkHttpSender.create("http://localhost:9411/api/v1/spans"))
@@ -37,7 +37,9 @@ trait ZipkinTraceServiceLike {
 
   // used by a tracer report data to Zipkin
   implicit val executionContext: ExecutionContext
-  val tracer: Tracer
+  val tracing: Tracing
+
+  private def tracer: Tracer = tracing.tracer
 
   /**
    * Creates a new client span within an existing trace and reports the span complete.
@@ -150,7 +152,7 @@ trait ZipkinTraceServiceLike {
    * @return a new span created from request headers
    */
   private[trace] def newSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
-    val contextOrFlags = Propagation.B3_STRING.extractor(new Propagation.Getter[A, String] {
+    val contextOrFlags = tracing.propagation().extractor(new Propagation.Getter[A, String] {
       def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
     }).extract(headers)
 
@@ -169,7 +171,7 @@ trait ZipkinTraceServiceLike {
    * @return a span extracted from request headers
    */
   private[trace] def toSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
-    val contextOrFlags = Propagation.B3_STRING.extractor(new Propagation.Getter[A, String] {
+    val contextOrFlags = tracing.propagation().extractor(new Propagation.Getter[A, String] {
       def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
     }).extract(headers)
 
@@ -185,7 +187,7 @@ trait ZipkinTraceServiceLike {
   private[trace] def toMap(span: Span): Map[String, String] = {
     val data = collection.mutable.Map[String, String]()
 
-    Propagation.B3_STRING.injector(new Propagation.Setter[collection.mutable.Map[String, String], String] {
+    tracing.propagation().injector(new Propagation.Setter[collection.mutable.Map[String, String], String] {
       def put(carrier: collection.mutable.Map[String, String], key: String, value: String): Unit = carrier += key -> value
     }).inject(span.context(), data)
 
