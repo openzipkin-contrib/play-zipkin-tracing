@@ -7,6 +7,7 @@ object ZipkinTraceConfig {
 
   val ZipkinHost = "trace.zipkin.host"
   val ZipkinPort = "trace.zipkin.port"
+  val ZipkinProtocol = "trace.zipkin.protocol"
   val ZipkinSampleRate = "trace.zipkin.sample-rate"
 
 }

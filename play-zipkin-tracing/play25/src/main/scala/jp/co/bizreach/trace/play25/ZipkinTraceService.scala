@@ -28,7 +28,7 @@ class ZipkinTraceService @Inject() (
     .localServiceName(conf.getString(ZipkinTraceConfig.ServiceName) getOrElse "unknown")
     .reporter(AsyncReporter
       .builder(OkHttpSender.create(
-        s"http://${conf.getString(ZipkinTraceConfig.ZipkinHost) getOrElse "localhost"}:${conf.getInt(ZipkinTraceConfig.ZipkinPort) getOrElse 9411}/api/v1/spans"
+        s"${conf.getString(ZipkinTraceConfig.ZipkinProtocol) getOrElse "http"}://${conf.getString(ZipkinTraceConfig.ZipkinHost) getOrElse "localhost"}:${conf.getInt(ZipkinTraceConfig.ZipkinPort) getOrElse 9411}/api/v1/spans"
       ))
       .build()
     )
