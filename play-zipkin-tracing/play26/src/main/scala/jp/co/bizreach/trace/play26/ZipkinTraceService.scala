@@ -3,7 +3,7 @@ package jp.co.bizreach.trace.play26
 import javax.inject.Inject
 
 import akka.actor.ActorSystem
-import brave.Tracer
+import brave.Tracing
 import brave.sampler.Sampler
 import jp.co.bizreach.trace.{ZipkinTraceConfig, ZipkinTraceServiceLike}
 import play.api.Configuration
@@ -13,7 +13,7 @@ import zipkin.reporter.okhttp3.OkHttpSender
 import scala.concurrent.ExecutionContext
 
 /**
- * Class for Zipkin tracing at Play2.5.
+ * Class for Zipkin tracing at Play2.6.
  *
  * @param conf a Play's configuration
  * @param actorSystem a Play's actor system
@@ -24,7 +24,7 @@ class ZipkinTraceService @Inject() (
 
   implicit val executionContext: ExecutionContext = actorSystem.dispatchers.lookup(ZipkinTraceConfig.AkkaName)
 
-  val tracer = Tracer.newBuilder()
+  val tracing = Tracing.newBuilder()
     .localServiceName(conf.getString(ZipkinTraceConfig.ServiceName) getOrElse "unknown")
     .reporter(AsyncReporter
       .builder(OkHttpSender.create(

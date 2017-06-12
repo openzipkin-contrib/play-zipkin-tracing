@@ -1,6 +1,6 @@
 package jp.co.bizreach.trace
 
-import brave.Tracer
+import brave.Tracing
 import brave.internal.HexCodec
 import org.scalatest.FunSuite
 import zipkin.Span
@@ -109,7 +109,7 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
 class TestZipkinTraceService extends ZipkinTraceServiceLike {
   override implicit val executionContext: ExecutionContext = ExecutionContext.global
   val reporter = new TestReporter()
-  override val tracer: Tracer = Tracer.newBuilder().reporter(reporter).build()
+  override val tracing: Tracing = Tracing.newBuilder().reporter(reporter).build()
 }
 
 class TestReporter extends Reporter[Span] {

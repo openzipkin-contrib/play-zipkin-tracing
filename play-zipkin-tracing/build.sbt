@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
-  version := "1.1.0",
+  version := "1.2.0-SNAPSHOT",
   scalaVersion := "2.11.8",
   publishMavenStyle := true,
   publishTo := {
@@ -60,9 +60,9 @@ lazy val core = (project in file("core")).
     name := "play-zipkin-tracing-core",
     libraryDependencies ++= Seq(
       "commons-lang" % "commons-lang" % "2.6",
-      "io.zipkin.brave" % "brave" % "4.0.6",
-      "io.zipkin.reporter" % "zipkin-sender-okhttp3" % "0.6.12",
-      "org.scalatest" %% "scalatest" % "3.0.2" % "test"
+      "io.zipkin.brave" % "brave" % "4.3.3",
+      "io.zipkin.reporter" % "zipkin-sender-okhttp3" % "0.10.0",
+      "org.scalatest" %% "scalatest" % "3.0.3" % "test"
     )
   )
 

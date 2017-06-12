@@ -1,6 +1,6 @@
 package jp.co.bizreach.trace.play23
 
-import brave.Tracer
+import brave.Tracing
 import brave.sampler.Sampler
 import jp.co.bizreach.trace._
 import play.api.{Play, Configuration}
@@ -19,7 +19,7 @@ object ZipkinTraceService extends ZipkinTraceServiceLike {
 
   implicit val executionContext: ExecutionContext = Akka.system.dispatchers.lookup(ZipkinTraceConfig.AkkaName)
 
-  val tracer = Tracer.newBuilder()
+  val tracing = Tracing.newBuilder()
     .localServiceName(conf.getString(ZipkinTraceConfig.ServiceName) getOrElse "unknown")
     .reporter(AsyncReporter
       .builder(OkHttpSender.create(
