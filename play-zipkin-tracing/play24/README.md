@@ -9,7 +9,7 @@ Add following configuration to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play24" % "1.2.0-SNAPSHOT"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play24" % "1.2.0"
 )
 
 routesGenerator := InjectedRoutesGenerator

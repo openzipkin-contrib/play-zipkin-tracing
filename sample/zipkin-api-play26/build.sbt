@@ -21,7 +21,7 @@ val AkkaVersion = "2.4.11"
 resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.2.0-SNAPSHOT"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.2.0"
 )
 
 PlayKeys.playDefaultPort := 9991

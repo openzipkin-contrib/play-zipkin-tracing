@@ -17,7 +17,7 @@ libraryDependencies ++= Seq(
 val AkkaVersion = "2.4.11"
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play25" % "1.2.0-SNAPSHOT"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play25" % "1.2.0"
 )
 
 PlayKeys.playDefaultPort := 9991
