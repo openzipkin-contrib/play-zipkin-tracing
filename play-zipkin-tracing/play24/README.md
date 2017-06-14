@@ -9,7 +9,7 @@ Add following configuration to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play24" % "1.1.0"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play24" % "1.2.0-SNAPSHOT"
 )
 
 routesGenerator := InjectedRoutesGenerator
@@ -24,8 +24,7 @@ trace {
   service-name = "zipkin-api-sample"
 
   zipkin {
-    host = "localhost"
-    port = 9411
+    base-url = "http://localhost:9411"
     sample-rate = 0.1
   }
 }

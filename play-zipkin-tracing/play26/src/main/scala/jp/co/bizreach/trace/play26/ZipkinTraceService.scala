@@ -25,14 +25,14 @@ class ZipkinTraceService @Inject() (
   implicit val executionContext: ExecutionContext = actorSystem.dispatchers.lookup(ZipkinTraceConfig.AkkaName)
 
   val tracing = Tracing.newBuilder()
-    .localServiceName(conf.getString(ZipkinTraceConfig.ServiceName) getOrElse "unknown")
+    .localServiceName(conf.getOptional[String](ZipkinTraceConfig.ServiceName) getOrElse "unknown")
     .reporter(AsyncReporter
       .builder(OkHttpSender.create(
-        s"http://${conf.getString(ZipkinTraceConfig.ZipkinHost) getOrElse "localhost"}:${conf.getInt(ZipkinTraceConfig.ZipkinPort) getOrElse 9411}/api/v1/spans"
+        (conf.getOptional[String](ZipkinTraceConfig.ZipkinBaseUrl) getOrElse "http://localhost:9411") + "/api/v1/spans"
       ))
       .build()
     )
-    .sampler(conf.getString(ZipkinTraceConfig.ZipkinSampleRate)
+    .sampler(conf.getOptional[String](ZipkinTraceConfig.ZipkinSampleRate)
       .map(s => Sampler.create(s.toFloat)) getOrElse Sampler.ALWAYS_SAMPLE
     )
     .build()
