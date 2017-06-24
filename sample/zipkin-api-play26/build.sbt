@@ -6,7 +6,7 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
-scalaVersion := "2.11.8"
+scalaVersion := "2.12.2"
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -19,9 +19,10 @@ val AkkaVersion = "2.4.11"
 
 // TODO temporary
 resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
+resolvers += Resolver.mavenLocal
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.2.0"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.3.0"
 )
 
 PlayKeys.playDefaultPort := 9991

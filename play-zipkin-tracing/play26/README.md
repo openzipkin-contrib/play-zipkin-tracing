@@ -9,7 +9,7 @@ Add following dependency to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.2.0"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.3.0"
 )
 ```
 
