@@ -66,10 +66,10 @@ private class TraceWSRequest(spanName: String, request: WSRequest, tracer: Zipki
   override def withMethod(method: String): TraceWSRequest = new TraceWSRequest(spanName, request.withMethod(method), tracer, traceData)
 
   override def execute(): Future[Response] = tracer.traceWS(spanName, traceData){ span =>
-    request.withHeaders(tracer.toMap(span).toSeq: _*).execute()
+    request.addHttpHeaders(tracer.toMap(span).toSeq: _*).execute()
   }
   override def stream(): Future[Response] = tracer.traceWS(spanName, traceData){ span =>
-    request.withHeaders(tracer.toMap(span).toSeq: _*).stream()
+    request.addHttpHeaders(tracer.toMap(span).toSeq: _*).stream()
   }
 
   override def uri: URI = request.uri
