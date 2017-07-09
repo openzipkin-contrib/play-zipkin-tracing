@@ -5,6 +5,7 @@ import javax.inject.Inject
 import akka.stream.Materializer
 import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import play.api.mvc.{Filter, Headers, RequestHeader, Result}
+import play.api.routing.Router
 
 import scala.concurrent.Future
 import scala.util.Failure
@@ -33,7 +34,7 @@ class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val 
       spanName = reqHeaderToSpanName(req),
       span = tracer.newSpan(req.headers)((headers, key) => headers.get(key))
     )
-    val result = nextFilter(req.copy(headers = new Headers(
+    val result = nextFilter(req.withHeaders(new Headers(
       (req.headers.toMap.mapValues(_.headOption getOrElse "") ++ tracer.toMap(serverSpan)).toSeq
     )))
     result.onComplete {
@@ -47,8 +48,10 @@ class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val 
 object ZipkinTraceFilter {
   val ParamAwareRequestNamer: RequestHeader => String = { reqHeader =>
     import org.apache.commons.lang3.StringUtils
-    val tags = reqHeader.tags
-    val pathPattern = StringUtils.replace(tags.getOrElse(play.api.routing.Router.Tags.RoutePattern, reqHeader.path), "<[^/]+>", "")
+    val pathPattern = StringUtils.replace(
+      reqHeader.attrs.get(Router.Attrs.HandlerDef).map(_.path).getOrElse(reqHeader.path),
+      "<[^/]+>", ""
+    )
     s"${reqHeader.method} - $pathPattern"
   }
 }
