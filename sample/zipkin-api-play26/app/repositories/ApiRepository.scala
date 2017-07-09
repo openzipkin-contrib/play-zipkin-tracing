@@ -6,7 +6,6 @@ import jp.co.bizreach.trace.play26.TraceWSClient
 import jp.co.bizreach.trace.{TraceData, ZipkinTraceServiceLike}
 import jp.co.bizreach.trace.play26.implicits.ZipkinTraceImplicits
 import play.api.Logger
-import play.api.libs.ws.WSClient
 
 import scala.concurrent.{ExecutionContext, Future}
 
