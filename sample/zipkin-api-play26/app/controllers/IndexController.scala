@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Named
 
 import com.google.inject.Inject
-import jp.co.bizreach.trace.play26.AkkaSupport.{TraceMessage, ZipkinTraceActor}
+import jp.co.bizreach.trace.play26.AkkaSupport._
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
@@ -20,10 +20,10 @@ import jp.co.bizreach.trace.play26.implicits.ZipkinTraceImplicits
 class IndexController @Inject() (
   @Named("hello-actor") helloActor: ActorRef,
   components: ControllerComponents,
-  service: ApiSampleService,
-  val tracer: ZipkinTraceServiceLike
+  service: ApiSampleService
 ) (
-  implicit ec: ExecutionContext
+  implicit ec: ExecutionContext,
+  val tracer: ZipkinTraceServiceLike
 ) extends AbstractController(components) with ZipkinTraceImplicits {
 
   def index = Action.async { implicit req =>
@@ -39,20 +39,20 @@ class IndexController @Inject() (
   def nest = Action.async { implicit req =>
     Logger.debug(req.headers.toSimpleMap.map{ case (k, v) => s"${k}:${v}"}.toSeq.mkString("\n"))
 
-    helloActor ! HelloActorMessage("This is an actor call!")
+    TraceActorRef(helloActor) ! HelloActorMessage("This is an actor call!")
 
     service.sample("http://localhost:9992/api/nest").map(v => Ok(Json.obj("result" -> v)))
   }
 }
 
-case class HelloActorMessage(message: String)(implicit val traceData: TraceData) extends TraceMessage
+case class HelloActorMessage(message: String)(implicit val traceData: ActorTraceData) extends TraceMessage
 
-class HelloActor @Inject()(@Named("child-hello-actor") child: ActorRef, val tracer: ZipkinTraceServiceLike) extends ZipkinTraceActor {
+class HelloActor @Inject()(@Named("child-hello-actor") child: ActorRef)(implicit val tracer: ZipkinTraceServiceLike) extends ZipkinTraceActor {
   def receive = {
     case m: HelloActorMessage => {
       Thread.sleep(1000)
       println(m.message)
-      child ! HelloActorMessage("This is a child actor call!")
+      TraceActorRef(child) ! HelloActorMessage("This is a child actor call!")
     }
   }
 }
