@@ -1,9 +1,10 @@
 package jp.co.bizreach.trace
 
+import brave.propagation.TraceContext
 import brave.{Span, Tracer, Tracing}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Success, Try, Failure}
+import scala.util.{Failure, Success, Try}
 
 /**
  * Basic trait for Zipkin tracing at Play.
@@ -137,6 +138,20 @@ trait ZipkinTraceServiceLike {
     Option(contextOrFlags.context())
       .map(tracer.newChild)
       .getOrElse(tracer.newTrace(contextOrFlags.samplingFlags()))
+  }
+
+  /**
+   * Creates a span from a parent context.
+   * If the parent span is None, creates a new trace.
+   *
+   * @param parent the parent context
+   * @return a new span created from the parent context
+   */
+  private[trace] def newSpan(parent: Option[TraceContext]): Span = {
+    parent match {
+      case Some(x) => tracer.newChild(x)
+      case None    => tracer.newTrace()
+    }
   }
 
   /**
