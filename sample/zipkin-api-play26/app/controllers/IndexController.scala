@@ -43,8 +43,8 @@ class IndexController @Inject() (
     Logger.debug(req.headers.toSimpleMap.map{ case (k, v) => s"${k}:${v}"}.toSeq.mkString("\n"))
 
     implicit val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
-    val f1 = TraceActorRef(helloActor) ? HelloActorMessage("This is an actor call!")
-    val f2 = service.sample("http://localhost:9992/api/nest") //.map(v => Ok(Json.obj("result" -> v)))
+    val f1 = TraceableActorRef(helloActor) ? HelloActorMessage("This is an actor call!")
+    val f2 = service.sample("http://localhost:9992/api/nest")
 
     for {
       r1 <- f1
@@ -55,18 +55,19 @@ class IndexController @Inject() (
 
 case class HelloActorMessage(message: String)(implicit val traceData: ActorTraceData) extends TraceMessage
 
-class HelloActor @Inject()(@Named("child-hello-actor") child: ActorRef)(implicit val tracer: ZipkinTraceServiceLike) extends ZipkinTraceActor {
+class HelloActor @Inject()(@Named("child-hello-actor") child: ActorRef)
+                          (implicit val tracer: ZipkinTraceServiceLike) extends TraceableActor {
   def receive = {
     case m: HelloActorMessage => {
       Thread.sleep(1000)
       println(m.message)
-      TraceActorRef(child) ! HelloActorMessage("This is a child actor call!")
+      TraceableActorRef(child) ! HelloActorMessage("This is a child actor call!")
       sender() ! "result"
     }
   }
 }
 
-class ChildHelloActor @Inject()(val tracer: ZipkinTraceServiceLike) extends ZipkinTraceActor {
+class ChildHelloActor @Inject()(val tracer: ZipkinTraceServiceLike) extends TraceableActor {
   def receive = {
     case m: HelloActorMessage => {
       Thread.sleep(1000)

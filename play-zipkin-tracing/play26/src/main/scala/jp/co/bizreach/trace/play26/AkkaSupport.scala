@@ -12,14 +12,39 @@ import scala.util.{Failure, Success, Try}
 
 object AkkaSupport {
 
-  // TODO TraceData is available for only local actors. We have to invent another solution for remote actors.
+  /**
+   * Mix-in this trait to message class for traced actor.
+   * Typically, traceData property would be declared as `implicit val` as follows:
+   *
+   * {{{
+   * case class HelloActorMessage(message: String)(implicit val traceData: ActorTraceData)
+   *   extends TraceMessage
+   * }}}
+   *
+   * TODO TraceData is available for only local actors. We have to invent another solution for remote actors.
+   */
   trait TraceMessage {
     val traceData: ActorTraceData
   }
 
   case class ActorTraceData(span: Span)
 
-  trait ZipkinTraceActor extends AroundReceiveOverrideHack {
+  /**
+   * Traceable actor have to extend this trait.
+   *
+   * {{{
+   * class HelloActor @Inject()(val tracer: ZipkinTraceServiceLike) extends TraceableActor {
+   *   def receive = {
+   *     case m: HelloActorMessage => {
+   *       println(m.message)
+   *     }
+   *   }
+   * }
+   * }}}
+   *
+   * You can call this actor by injecting its `ActorRef` by Play's dependency injection.
+   */
+  trait TraceableActor extends AroundReceiveOverrideHack {
 
     val tracer: ZipkinTraceServiceLike
 
@@ -48,7 +73,7 @@ object AkkaSupport {
     }
   }
 
-  class TraceActorRef(actorRef: ActorRef, tracer: ZipkinTraceServiceLike){
+  class TraceableActorRef(actorRef: ActorRef, tracer: ZipkinTraceServiceLike){
     def ! [T <: TraceMessage](message: T): Unit = {
       actorRef ! message
       message.traceData.span.name("! - " + actorRef.path.name).start().flush()
@@ -68,9 +93,20 @@ object AkkaSupport {
     }
   }
 
-  object TraceActorRef {
-    def apply(actorRef: ActorRef)(implicit tracer: ZipkinTraceServiceLike): TraceActorRef = {
-      new TraceActorRef(actorRef, tracer)
+  /**
+   * Decorate `ActorRef` of [[TraceableActor]].
+   *
+   * {{{
+   * // tell
+   * TraceableActorRef(actorRef) ! message
+   *
+   * // ask
+   * val f: Future[Any] = TraceableActorRef(actorRef) ? message
+   * }}}
+   */
+  object TraceableActorRef {
+    def apply(actorRef: ActorRef)(implicit tracer: ZipkinTraceServiceLike): TraceableActorRef = {
+      new TraceableActorRef(actorRef, tracer)
     }
   }
 
