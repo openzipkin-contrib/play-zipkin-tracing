@@ -51,12 +51,12 @@ object AkkaSupport {
   class TraceActorRef(actorRef: ActorRef, tracer: ZipkinTraceServiceLike){
     def ! [T <: TraceMessage](message: T): Unit = {
       actorRef ! message
-      message.traceData.span.name(actorRef.path.name).start().flush()
+      message.traceData.span.name("! - " + actorRef.path.name).start().flush()
     }
 
     def ? [T <: TraceMessage](message: T)(implicit timeout: Timeout): Future[Any] = {
       val f = actorRef ? message
-      message.traceData.span.name(actorRef.path.name).start()
+      message.traceData.span.name("? - " + actorRef.path.name).start()
       f.onComplete {
         case Failure(t) =>
           message.traceData.span.tag("failed", s"Finished with exception: ${t.getMessage}")
