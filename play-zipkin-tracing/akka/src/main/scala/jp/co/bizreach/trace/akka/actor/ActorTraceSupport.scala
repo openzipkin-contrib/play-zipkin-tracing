@@ -1,4 +1,4 @@
-package jp.co.bizreach.trace.play26
+package jp.co.bizreach.trace.akka.actor
 
 import akka.AroundReceiveOverrideHack
 import akka.actor.ActorRef
@@ -10,7 +10,7 @@ import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-object AkkaSupport {
+object ActorTraceSupport {
 
   /**
    * Mix-in this trait to message class for traced actor.

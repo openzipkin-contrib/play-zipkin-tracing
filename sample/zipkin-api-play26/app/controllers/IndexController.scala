@@ -4,17 +4,16 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Named
 
 import com.google.inject.Inject
-import jp.co.bizreach.trace.play26.AkkaSupport._
+import jp.co.bizreach.trace.akka.actor.ActorTraceSupport._
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 import services.ApiSampleService
 import akka.actor._
-import akka.pattern.ask
 import akka.util.Timeout
 
 import scala.concurrent.{ExecutionContext, Future}
-import jp.co.bizreach.trace.{TraceData, ZipkinTraceServiceLike}
+import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import jp.co.bizreach.trace.play26.implicits.ZipkinTraceImplicits
 
 /**

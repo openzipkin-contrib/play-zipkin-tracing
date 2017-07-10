@@ -47,13 +47,15 @@ val play26Version = "2.6.0"
 //val play24Version = "2.4.8"
 //val play23Version = "2.3.10"
 
+val akkaVersion = "2.5.3"
+
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     name := "play-zipkin-tracing",
     publishArtifact := false
   ).
-  aggregate(core, play26)
+  aggregate(core, akka, play26)
 
 lazy val core = (project in file("core")).
   settings(commonSettings: _*).
@@ -67,6 +69,17 @@ lazy val core = (project in file("core")).
     )
   )
 
+lazy val akka = (project in file("akka")).
+  settings(commonSettings: _*).
+  settings(
+    name := "play-zipkin-tracing-akka",
+    libraryDependencies ++= Seq(
+      "com.typesafe.akka" %% "akka-actor" % akkaVersion % Provided
+    )
+  ).dependsOn(
+    core % "test->test;compile->compile"
+  )
+
 lazy val play26 = (project in file("play26")).
   settings(commonSettings: _*).
   settings(
@@ -75,7 +88,10 @@ lazy val play26 = (project in file("play26")).
       "com.typesafe.play" %% "play" % play26Version % Provided,
       "com.typesafe.play" %% "play-ws" % play26Version % Provided
     )
-  ).dependsOn(core % "test->test;compile->compile")
+  ).dependsOn(
+    core % "test->test;compile->compile",
+    akka % "test->test;compile->compile"
+  )
 
 //lazy val play25 = (project in file("play25")).
 //  settings(commonSettings: _*).
