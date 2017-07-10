@@ -3,8 +3,7 @@ package jp.co.bizreach.trace.play26
 import akka.AroundReceiveOverrideHack
 import akka.actor.ActorRef
 import brave.Span
-import jp.co.bizreach.trace.{TraceData, ZipkinTraceServiceLike}
-import play.api.mvc.RequestHeader
+import jp.co.bizreach.trace.ZipkinTraceServiceLike
 
 object AkkaSupport {
 
@@ -44,7 +43,7 @@ object AkkaSupport {
   class TraceActorRef(actorRef: ActorRef, tracer: ZipkinTraceServiceLike){
     def ! [T <: TraceMessage](message: T): Unit = {
       actorRef ! message
-      message.traceData.span.start().flush()
+      message.traceData.span.name(actorRef.path.name).start().flush()
     }
   }
 
