@@ -5,6 +5,8 @@ import akka.actor.ActorRef
 import brave.Span
 import jp.co.bizreach.trace.ZipkinTraceServiceLike
 
+import scala.util.{Failure, Success, Try}
+
 object AkkaSupport {
 
   // TODO TraceData is available for only local actors. We have to invent another solution for remote actors.
@@ -29,10 +31,13 @@ object AkkaSupport {
           val oneWaySpan = tracer.tracing.tracer.newChild(serverSpan.context()).kind(Span.Kind.CLIENT)
           this.traceData = ActorTraceData(oneWaySpan)
 
-          try {
-            super.aroundReceiveMessage(receive, msg)
-          } finally {
-            tracer.serverSend(serverSpan)
+          Try(super.aroundReceiveMessage(receive, msg)) match {
+            case Failure(t) =>
+              serverSpan.tag("failed", s"Finished with exception: ${t.getMessage}")
+              tracer.serverSend(serverSpan)
+              throw t
+            case Success(_) =>
+              tracer.serverSend(serverSpan)
           }
         case _ =>
           super.aroundReceiveMessage(receive, msg)
