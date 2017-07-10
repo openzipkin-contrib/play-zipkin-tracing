@@ -28,17 +28,17 @@ class IndexController @Inject() (
   val tracer: ZipkinTraceServiceLike
 ) extends AbstractController(components) with ZipkinTraceImplicits {
 
-  def index = Action.async { implicit req =>
+  def index = Action.async { implicit req: Request[_] =>
     Future.successful(Ok(Json.obj("status" -> "ok")))
   }
 
-  def once = Action.async { implicit req =>
+  def once = Action.async { implicit req: Request[_] =>
     Logger.debug(req.headers.toSimpleMap.map{ case (k, v) => s"${k}:${v}"}.toSeq.mkString("\n"))
 
     service.sample("http://localhost:9992/api/once").map(_ => Ok(Json.obj("OK"->"OK")))
   }
 
-  def nest = Action.async { implicit req =>
+  def nest = Action.async { implicit req: Request[_] =>
     Logger.debug(req.headers.toSimpleMap.map{ case (k, v) => s"${k}:${v}"}.toSeq.mkString("\n"))
 
     implicit val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
