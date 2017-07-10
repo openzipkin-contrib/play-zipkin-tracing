@@ -2,9 +2,12 @@ package jp.co.bizreach.trace.play26
 
 import akka.AroundReceiveOverrideHack
 import akka.actor.ActorRef
+import akka.pattern.ask
+import akka.util.Timeout
 import brave.Span
 import jp.co.bizreach.trace.ZipkinTraceServiceLike
 
+import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
 object AkkaSupport {
@@ -49,6 +52,19 @@ object AkkaSupport {
     def ! [T <: TraceMessage](message: T): Unit = {
       actorRef ! message
       message.traceData.span.name(actorRef.path.name).start().flush()
+    }
+
+    def ? [T <: TraceMessage](message: T)(implicit timeout: Timeout): Future[Any] = {
+      val f = actorRef ? message
+      message.traceData.span.name(actorRef.path.name).start()
+      f.onComplete {
+        case Failure(t) =>
+          message.traceData.span.tag("failed", s"Finished with exception: ${t.getMessage}")
+          message.traceData.span.finish()
+        case _ =>
+          message.traceData.span.finish()
+      }(tracer.executionContext)
+      f
     }
   }
 
