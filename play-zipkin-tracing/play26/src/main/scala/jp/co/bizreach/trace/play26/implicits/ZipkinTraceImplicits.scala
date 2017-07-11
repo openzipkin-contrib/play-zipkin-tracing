@@ -30,7 +30,7 @@ trait ZipkinTraceImplicits {
    */
   implicit def request2actorTrace(implicit req: RequestHeader): ActorTraceData = {
     val span = tracer.toSpan(req.headers)((headers, key) => headers.get(key))
-    val oneWaySpan = tracer.tracing.tracer.newChild(span.context()).kind(Span.Kind.CLIENT)
+    val oneWaySpan = tracer.newSpan(Some(span.context())).kind(Span.Kind.CLIENT)
     ActorTraceData(span = oneWaySpan)
   }
 

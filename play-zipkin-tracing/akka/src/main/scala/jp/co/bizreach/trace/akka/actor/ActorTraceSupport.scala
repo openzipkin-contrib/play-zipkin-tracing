@@ -52,8 +52,8 @@ object ActorTraceSupport {
 
     override protected def aroundReceiveMessage(receive: Receive, msg: Any): Unit = {
       msg match {
-        case traceMessage: TraceMessage =>
-          val serverSpan = tracer.newSpan(Some(traceMessage.traceData.span.context)).kind(Span.Kind.SERVER)
+        case m: TraceMessage =>
+          val serverSpan = tracer.newSpan(Some(m.traceData.span.context)).kind(Span.Kind.SERVER)
           tracer.serverReceived(self.path.name, serverSpan)
 
           val clientSpan = tracer.newSpan(Some(serverSpan.context)).kind(Span.Kind.CLIENT)
