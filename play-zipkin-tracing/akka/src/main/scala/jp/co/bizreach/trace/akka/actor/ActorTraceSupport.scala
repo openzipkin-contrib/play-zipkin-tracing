@@ -27,7 +27,48 @@ object ActorTraceSupport {
     val traceData: ActorTraceData
   }
 
+  /**
+   * Mix-in this trait to message class instead of [[TraceMessage]] if the target actor is a remote actor.
+   *
+   * {{{
+   * case class HelloActorMessage(message: String)(implicit val traceData: RemoteActorTraceData)
+   *   extends RemoteTraceMessage
+   * }}}
+   */
+  trait RemoteTraceMessage {
+    val traceData: RemoteActorTraceData
+  }
+
   case class ActorTraceData(span: Span)
+
+  object ActorTraceData {
+    def apply()(implicit tracer: ZipkinTraceServiceLike): ActorTraceData = {
+      ActorTraceData(tracer.newSpan(None).kind(Span.Kind.CLIENT))
+    }
+  }
+
+  case class RemoteActorTraceData(span: java.util.HashMap[String, String])
+
+  object RemoteActorTraceData {
+    def apply()(implicit tracer: ZipkinTraceServiceLike): RemoteActorTraceData = {
+      RemoteActorTraceData(span2map(tracer.newSpan(None).kind(Span.Kind.CLIENT), tracer))
+    }
+  }
+
+  private def span2map(span: Span, tracer: ZipkinTraceServiceLike): java.util.HashMap[String, String] = {
+    val data = new java.util.HashMap[String, String]()
+    tracer.tracing.propagation().injector(
+      (carrier: java.util.HashMap[String, String], key: String, value: String) => carrier.put(key, value)
+    ).inject(span.context(), data)
+    data
+  }
+
+  private def map2span(data: java.util.HashMap[String, String], tracer: ZipkinTraceServiceLike): Span = {
+    val contextOrFlags = tracer.tracing.propagation().extractor(
+      (carrier: java.util.HashMap[String, String], key: String) => carrier.get(key)
+    ).extract(data)
+    tracer.tracing.tracer.joinSpan(contextOrFlags.context())
+  }
 
   /**
    * Traceable actor have to extend this trait.
@@ -49,11 +90,27 @@ object ActorTraceSupport {
     val tracer: ZipkinTraceServiceLike
 
     implicit var traceData: ActorTraceData = null
+    implicit def remoteTraceData: RemoteActorTraceData = RemoteActorTraceData(span2map(traceData.span, tracer))
 
     override protected def aroundReceiveMessage(receive: Receive, msg: Any): Unit = {
       msg match {
         case m: TraceMessage =>
           val serverSpan = tracer.newSpan(Some(m.traceData.span.context)).kind(Span.Kind.SERVER)
+          tracer.serverReceived(self.path.name, serverSpan)
+
+          val clientSpan = tracer.newSpan(Some(serverSpan.context)).kind(Span.Kind.CLIENT)
+          this.traceData = ActorTraceData(clientSpan)
+
+          Try(super.aroundReceiveMessage(receive, msg)) match {
+            case Failure(t) =>
+              serverSpan.tag("failed", s"Finished with exception: ${t.getMessage}")
+              tracer.serverSend(serverSpan)
+              throw t
+            case Success(_) =>
+              tracer.serverSend(serverSpan)
+          }
+        case m: RemoteTraceMessage =>
+          val serverSpan = tracer.newSpan(Some(map2span(m.traceData.span, tracer).context)).kind(Span.Kind.SERVER)
           tracer.serverReceived(self.path.name, serverSpan)
 
           val clientSpan = tracer.newSpan(Some(serverSpan.context)).kind(Span.Kind.CLIENT)
@@ -76,23 +133,46 @@ object ActorTraceSupport {
   }
 
   class TraceableActorRef(actorRef: ActorRef, tracer: ZipkinTraceServiceLike){
-    def ! [T <: TraceMessage](message: T): Unit = {
+    def ! (message: Any): Unit = {
       actorRef ! message
-      message.traceData.span.name("! - " + actorRef.path.name).start().flush()
+      message match {
+        case m: TraceMessage =>
+          m.traceData.span.name("! - " + actorRef.path.name).start().flush()
+        case m: RemoteTraceMessage =>
+          val span = map2span(m.traceData.span, tracer)
+          span.name("! - " + actorRef.path.name).start().flush()
+        case _ =>
+      }
     }
 
-    def ? [T <: TraceMessage](message: T)(implicit timeout: Timeout): Future[Any] = {
+    def ? (message: Any)(implicit timeout: Timeout): Future[Any] = {
       val f = actorRef ? message
-      message.traceData.span.name("? - " + actorRef.path.name).start()
-      f.onComplete {
-        case Failure(t) =>
-          message.traceData.span.tag("failed", s"Finished with exception: ${t.getMessage}")
-          message.traceData.span.finish()
+      message match {
+        case m: TraceMessage =>
+          m.traceData.span.name("? - " + actorRef.path.name).start()
+          f.onComplete {
+            case Failure(t) =>
+              m.traceData.span.tag("failed", s"Finished with exception: ${t.getMessage}")
+              m.traceData.span.finish()
+            case _ =>
+              m.traceData.span.finish()
+          }(tracer.executionContext)
+
+        case m: RemoteTraceMessage =>
+          val span = map2span(m.traceData.span, tracer)
+          span.name("? - " + actorRef.path.name).start()
+          f.onComplete {
+            case Failure(t) =>
+              span.tag("failed", s"Finished with exception: ${t.getMessage}")
+              span.finish()
+            case _ =>
+              span.finish()
+          }(tracer.executionContext)
         case _ =>
-          message.traceData.span.finish()
-      }(tracer.executionContext)
+      }
       f
     }
+
   }
 
   /**

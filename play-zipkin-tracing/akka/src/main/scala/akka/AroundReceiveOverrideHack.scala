@@ -2,6 +2,9 @@ package akka
 
 import akka.actor.Actor
 
+/**
+ * This trait makes possible to intercept actor process.
+ */
 trait AroundReceiveOverrideHack extends Actor {
 
   override protected[akka] def aroundReceive(receive: Receive, msg: Any): Unit = {
