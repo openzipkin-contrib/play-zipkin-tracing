@@ -3,7 +3,6 @@ import java.util.concurrent.TimeUnit
 import actors.{HelloWorldActor, HelloWorldMessage}
 import akka.actor._
 import akka.util.Timeout
-import brave.Span
 import jp.co.bizreach.trace.akka.actor.ActorTraceSupport._
 import jp.co.bizreach.trace.akka.actor.ZipkinTraceService
 
@@ -18,11 +17,7 @@ object Main extends App {
 
   val actor = system.actorOf(Props(classOf[HelloWorldActor], tracer), "parent-actor")
 
-  // TODO Won't create an initial span explicitly...
-  val span = tracer.tracing.tracer.newTrace().kind(Span.Kind.CLIENT)
-  val initialTraceData = ActorTraceData(span)
-
-  val f = TraceableActorRef(actor) ? HelloWorldMessage("Test")(initialTraceData)
+  val f = TraceableActorRef(actor) ? HelloWorldMessage("Test")(ActorTraceData())
   val result = Await.result(f, Duration.Inf)
   println(result)
 
