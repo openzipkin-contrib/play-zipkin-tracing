@@ -47,25 +47,27 @@ object ActorTraceSupport {
     }
   }
 
-  case class RemoteActorTraceData(span: java.util.HashMap[String, String])
+  type RemoteSpan = java.util.HashMap[String, String]
+
+  case class RemoteActorTraceData(span: RemoteSpan)
 
   object RemoteActorTraceData {
     def apply()(implicit tracer: ZipkinTraceServiceLike): RemoteActorTraceData = {
-      RemoteActorTraceData(span2map(tracer.newSpan(None).kind(Span.Kind.CLIENT), tracer))
+      RemoteActorTraceData(toRemoteSpan(tracer.newSpan(None).kind(Span.Kind.CLIENT), tracer))
     }
   }
 
-  private def span2map(span: Span, tracer: ZipkinTraceServiceLike): java.util.HashMap[String, String] = {
-    val data = new java.util.HashMap[String, String]()
+  private def toRemoteSpan(span: Span, tracer: ZipkinTraceServiceLike): RemoteSpan = {
+    val data = new RemoteSpan()
     tracer.tracing.propagation().injector(
-      (carrier: java.util.HashMap[String, String], key: String, value: String) => carrier.put(key, value)
+      (carrier: RemoteSpan, key: String, value: String) => carrier.put(key, value)
     ).inject(span.context(), data)
     data
   }
 
-  private def map2span(data: java.util.HashMap[String, String], tracer: ZipkinTraceServiceLike): Span = {
+  private def fromRemoteSpan(data: RemoteSpan, tracer: ZipkinTraceServiceLike): Span = {
     val contextOrFlags = tracer.tracing.propagation().extractor(
-      (carrier: java.util.HashMap[String, String], key: String) => carrier.get(key)
+      (carrier: RemoteSpan, key: String) => carrier.get(key)
     ).extract(data)
     tracer.tracing.tracer.joinSpan(contextOrFlags.context())
   }
@@ -90,7 +92,7 @@ object ActorTraceSupport {
     val tracer: ZipkinTraceServiceLike
 
     implicit var traceData: ActorTraceData = null
-    implicit def remoteTraceData: RemoteActorTraceData = RemoteActorTraceData(span2map(traceData.span, tracer))
+    implicit def remoteTraceData: RemoteActorTraceData = RemoteActorTraceData(toRemoteSpan(traceData.span, tracer))
 
     override protected def aroundReceiveMessage(receive: Receive, msg: Any): Unit = {
       msg match {
@@ -110,7 +112,7 @@ object ActorTraceSupport {
               tracer.serverSend(serverSpan)
           }
         case m: RemoteTraceMessage =>
-          val serverSpan = tracer.newSpan(Some(map2span(m.traceData.span, tracer).context)).kind(Span.Kind.SERVER)
+          val serverSpan = tracer.newSpan(Some(fromRemoteSpan(m.traceData.span, tracer).context)).kind(Span.Kind.SERVER)
           tracer.serverReceived(self.path.name, serverSpan)
 
           val clientSpan = tracer.newSpan(Some(serverSpan.context)).kind(Span.Kind.CLIENT)
@@ -139,7 +141,7 @@ object ActorTraceSupport {
         case m: TraceMessage =>
           m.traceData.span.name("! - " + actorRef.path.name).start().flush()
         case m: RemoteTraceMessage =>
-          val span = map2span(m.traceData.span, tracer)
+          val span = fromRemoteSpan(m.traceData.span, tracer)
           span.name("! - " + actorRef.path.name).start().flush()
         case _ =>
       }
@@ -159,7 +161,7 @@ object ActorTraceSupport {
           }(tracer.executionContext)
 
         case m: RemoteTraceMessage =>
-          val span = map2span(m.traceData.span, tracer)
+          val span = fromRemoteSpan(m.traceData.span, tracer)
           span.name("? - " + actorRef.path.name).start()
           f.onComplete {
             case Failure(t) =>
