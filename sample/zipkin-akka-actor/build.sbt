@@ -11,7 +11,7 @@ resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 resolvers += Resolver.mavenLocal
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "1.3.1-SNAPSHOT",
+  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "1.4.0-SNAPSHOT",
   "com.typesafe.akka" %% "akka-actor" % "2.5.3"
 )
 
