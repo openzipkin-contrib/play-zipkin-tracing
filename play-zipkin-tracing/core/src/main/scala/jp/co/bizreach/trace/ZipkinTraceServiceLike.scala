@@ -1,10 +1,10 @@
 package jp.co.bizreach.trace
 
-import brave.propagation.Propagation
+import brave.propagation.TraceContext
 import brave.{Span, Tracer, Tracing}
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Success, Try, Failure}
+import scala.util.{Failure, Success, Try}
 
 /**
  * Basic trait for Zipkin tracing at Play.
@@ -98,27 +98,6 @@ trait ZipkinTraceServiceLike {
   }
 
   /**
-   * Creates a new client span within an existing trace and reports the span complete.
-   * This method is used to trace WS request automatically.
-   */
-  private[trace] def traceWS[A](traceName: String, parentData: TraceData)(f: Span => Future[A]): Future[A] = {
-    val childSpan = tracer.newChild(parentData.span.context()).name(traceName).kind(Span.Kind.CLIENT)
-    childSpan.start()
-
-    val result = f(childSpan)
-
-    result.onComplete {
-      case Failure(t) =>
-        childSpan.tag("failed", s"Finished with exception: ${t.getMessage}")
-        childSpan.finish()
-      case _ =>
-        childSpan.finish()
-    }
-
-    result
-  }
-
-  /**
    * Starts the server span. When a server received event has occurred, calling this.
    *
    * @param spanName the string name for this span
@@ -152,13 +131,27 @@ trait ZipkinTraceServiceLike {
    * @return a new span created from request headers
    */
   private[trace] def newSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
-    val contextOrFlags = tracing.propagation().extractor(new Propagation.Getter[A, String] {
-      def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
-    }).extract(headers)
+    val contextOrFlags = tracing.propagation().extractor(
+      (carrier: A, key: String) => getHeader(carrier, key).orNull
+    ).extract(headers)
 
     Option(contextOrFlags.context())
       .map(tracer.newChild)
       .getOrElse(tracer.newTrace(contextOrFlags.samplingFlags()))
+  }
+
+  /**
+   * Creates a span from a parent context.
+   * If the parent span is None, creates a new trace.
+   *
+   * @param parent the parent context
+   * @return a new span created from the parent context
+   */
+  private[trace] def newSpan(parent: Option[TraceContext]): Span = {
+    parent match {
+      case Some(x) => tracer.newChild(x)
+      case None    => tracer.newTrace()
+    }
   }
 
   /**
@@ -171,9 +164,9 @@ trait ZipkinTraceServiceLike {
    * @return a span extracted from request headers
    */
   private[trace] def toSpan[A](headers: A)(getHeader: (A, String) => Option[String]): Span = {
-    val contextOrFlags = tracing.propagation().extractor(new Propagation.Getter[A, String] {
-      def get(carrier: A, key: String): String = getHeader(carrier, key).orNull
-    }).extract(headers)
+    val contextOrFlags = tracing.propagation().extractor(
+      (carrier: A, key: String) => getHeader(carrier, key).orNull
+    ).extract(headers)
 
     tracer.joinSpan(contextOrFlags.context())
   }
@@ -187,9 +180,9 @@ trait ZipkinTraceServiceLike {
   private[trace] def toMap(span: Span): Map[String, String] = {
     val data = collection.mutable.Map[String, String]()
 
-    tracing.propagation().injector(new Propagation.Setter[collection.mutable.Map[String, String], String] {
-      def put(carrier: collection.mutable.Map[String, String], key: String, value: String): Unit = carrier += key -> value
-    }).inject(span.context(), data)
+    tracing.propagation().injector(
+      (carrier: collection.mutable.Map[String, String], key: String, value: String) => carrier += key -> value
+    ).inject(span.context(), data)
 
     data.toMap
   }

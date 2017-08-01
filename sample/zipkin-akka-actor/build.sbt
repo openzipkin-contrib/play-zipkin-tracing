@@ -1,31 +1,19 @@
 organization := "jp.co.bizreach"
 
-name := """zipkin-api-play26"""
+name := """zipkin-akka-actor"""
 
 version := "1.0-SNAPSHOT"
 
-lazy val root = (project in file(".")).enablePlugins(PlayScala)
-
 scalaVersion := "2.12.2"
-
-libraryDependencies ++= Seq(
-  jdbc,
-  cache,
-  ws,
-  guice
-)
-
-val AkkaVersion = "2.4.11"
 
 // TODO temporary
 resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 resolvers += Resolver.mavenLocal
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.3.1-SNAPSHOT"
+  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "1.3.1-SNAPSHOT",
+  "com.typesafe.akka" %% "akka-actor" % "2.5.3"
 )
-
-PlayKeys.playDefaultPort := 9991
 
 scalacOptions ++= Seq(
   "-feature",

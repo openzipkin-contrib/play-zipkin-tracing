@@ -65,12 +65,12 @@ private class TraceWSRequest(spanName: String, request: WSRequest, tracer: Zipki
   override def withProxyServer(proxyServer: WSProxyServer): TraceWSRequest = new TraceWSRequest(spanName, request.withProxyServer(proxyServer), tracer, traceData)
   override def withMethod(method: String): TraceWSRequest = new TraceWSRequest(spanName, request.withMethod(method), tracer, traceData)
 
-  override def execute(): Future[Response] = tracer.traceWS(spanName, traceData){ span =>
-    request.addHttpHeaders(tracer.toMap(span).toSeq: _*).execute()
-  }
-  override def stream(): Future[Response] = tracer.traceWS(spanName, traceData){ span =>
-    request.addHttpHeaders(tracer.toMap(span).toSeq: _*).stream()
-  }
+  override def execute(): Future[Response] = tracer.traceFuture(spanName){ data =>
+    request.addHttpHeaders(tracer.toMap(data.span).toSeq: _*).execute()
+  }(traceData)
+  override def stream(): Future[Response] = tracer.traceFuture(spanName){ data =>
+    request.addHttpHeaders(tracer.toMap(data.span).toSeq: _*).stream()
+  }(traceData)
 
   override def uri: URI = request.uri
   override def contentType: Option[String] = request.contentType
