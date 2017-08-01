@@ -20,8 +20,6 @@ object ActorTraceSupport {
    * case class HelloActorMessage(message: String)(implicit val traceData: ActorTraceData)
    *   extends TraceMessage
    * }}}
-   *
-   * TODO TraceData is available for only local actors. We have to invent another solution for remote actors.
    */
   trait TraceMessage {
     val traceData: ActorTraceData
