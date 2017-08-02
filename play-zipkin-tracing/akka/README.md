@@ -15,12 +15,13 @@ libraryDependencies ++= Seq(
 
 ## Usage
 
-### In standalone program
+### For standalone applications
 
 This is an example of traceable actors. The parent actor is `HelloWorldActor` and it calls `HelloWorldChildActor`.
 
 ```scala
-case class HelloWorldMessage(message: String)(implicit val traceData: ActorTraceData) extends TraceMessage
+case class HelloWorldMessage(message: String)
+  (implicit val traceData: ActorTraceData) extends TraceMessage
 
 class HelloWorldActor(implicit val tracer: ZipkinTraceServiceLike) extends TraceableActor {
   private val childActor = context.actorOf(Props(classOf[HelloWorldChildActor], tracer), "child-actor")
@@ -67,12 +68,13 @@ case class HelloWorldMessage(message: String)
   (implicit val traceData: RemoteActorTraceData) extends RemoteTraceMessage
 ```
 
-### With Play application
+### For Play applications
 
 Play offers [Akka integration](https://www.playframework.com/documentation/2.5.x/ScalaAkka). If you are using play-zipkin-tracing, you can track actor calls from a Play application as well. At first, let's take a look actors called from a Play application:
 
 ```scala
-case class HelloActorMessage(message: String)(implicit val traceData: ActorTraceData) extends TraceMessage
+case class HelloActorMessage(message: String)
+  (implicit val traceData: ActorTraceData) extends TraceMessage
 
 class HelloActor @Inject()(@Named("child-hello-actor") child: ActorRef)
                           (implicit val tracer: ZipkinTraceServiceLike) extends TraceableActor {
@@ -125,4 +127,3 @@ class IndexController @Inject() (
   }
 }
 ```
-
