@@ -20,6 +20,8 @@ libraryDependencies ++= Seq(
 This is an example of traceable actors. The parent actor is `HelloWorldActor` and it calls `HelloWorldChildActor`.
 
 ```scala
+case class HelloWorldMessage(message: String)(implicit val traceData: ActorTraceData) extends TraceMessage
+
 class HelloWorldActor(implicit val tracer: ZipkinTraceServiceLike) extends TraceableActor {
   private val childActor = context.actorOf(Props(classOf[HelloWorldChildActor], tracer), "child-actor")
   implicit val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
@@ -39,9 +41,6 @@ class HelloWorldChildActor(implicit val tracer: ZipkinTraceServiceLike) extends 
       Thread.sleep(100)
   }
 }
-
-case class HelloWorldMessage(message: String)
-  (implicit val traceData: ActorTraceData) extends TraceMessage
 ```
 
 You can call `HelloWorldActor` as follows:
@@ -70,4 +69,60 @@ case class HelloWorldMessage(message: String)
 
 ### With Play application
 
-TODO
+Play offers [Akka integration](https://www.playframework.com/documentation/2.5.x/ScalaAkka). If you are using play-zipkin-tracing, you can track actor calls from a Play application as well. At first, let's take a look actors called from a Play application:
+
+```scala
+case class HelloActorMessage(message: String)(implicit val traceData: ActorTraceData) extends TraceMessage
+
+class HelloActor @Inject()(@Named("child-hello-actor") child: ActorRef)
+                          (implicit val tracer: ZipkinTraceServiceLike) extends TraceableActor {
+  def receive = {
+    case m: HelloActorMessage => {
+      Thread.sleep(1000)
+      println(m.message)
+      TraceableActorRef(child) ! HelloActorMessage("This is a child actor call!")
+      sender() ! "result"
+    }
+  }
+}
+
+class ChildHelloActor @Inject()(val tracer: ZipkinTraceServiceLike) extends TraceableActor {
+  def receive = {
+    case m: HelloActorMessage => {
+      Thread.sleep(1000)
+      println(m.message)
+    }
+  }
+}
+```
+
+Next, below is a controller which calls `HelloActor` above:
+
+```scala
+class IndexController @Inject() (
+  @Named("hello-actor") helloActor: ActorRef,
+  components: ControllerComponents,
+  service: ApiSampleService
+) (
+  implicit ec: ExecutionContext,
+  val tracer: ZipkinTraceServiceLike
+) extends AbstractController(components) with ZipkinTraceImplicits {
+
+  def nest = Action.async { implicit req: Request[_] =>
+    Logger.debug(req.headers.toSimpleMap.map{ case (k, v) => s"${k}:${v}"}.toSeq.mkString("\n"))
+
+    implicit val timeout = Timeout(5000, TimeUnit.MILLISECONDS)
+    // Call an actor
+    val f1 = TraceableActorRef(helloActor) ? HelloActorMessage("This is an actor call!")
+    // Call a web service
+    val f2 = service.sample("http://localhost:9992/api/nest")
+    
+    // Composite futures
+    for {
+      r1 <- f1
+      r2 <- f2
+    } yield Ok(Json.obj("result" -> (r1 + " " + r2)))
+  }
+}
+```
+
