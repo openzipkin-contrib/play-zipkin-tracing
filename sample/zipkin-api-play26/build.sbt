@@ -22,7 +22,7 @@ resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 resolvers += Resolver.mavenLocal
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.3.1-SNAPSHOT"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "1.4.0"
 )
 
 PlayKeys.playDefaultPort := 9991
