@@ -3,7 +3,7 @@ package jp.co.bizreach.trace
 import brave.Tracing
 import brave.internal.HexCodec
 import org.scalatest.FunSuite
-import zipkin.Span
+import zipkin2.Span
 import zipkin.reporter.Reporter
 
 import scala.collection.mutable.ListBuffer
@@ -96,12 +96,11 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
 
     assert(tracer.reporter.spans.length == 1)
 
-    val reported = tracer.reporter.spans.find(_.name == "server-span").get
-    assert(reported.name == "server-span")
-    assert(reported.duration >= 500)
-    assert(reported.binaryAnnotations.size() == 1)
-    assert(reported.binaryAnnotations.get(0).key == "tag")
-    assert(reported.binaryAnnotations.get(0).value === "value".getBytes())
+    val reported = tracer.reporter.spans.find(_.name() == "server-span").get
+    assert(reported.name() == "server-span")
+    assert(reported.duration() >= 500)
+    assert(reported.tags().size() == 1)
+    assert(reported.tags().get("tag") === "value")
   }
 
 }
@@ -109,7 +108,7 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
 class TestZipkinTraceService extends ZipkinTraceServiceLike {
   override implicit val executionContext: ExecutionContext = ExecutionContext.global
   val reporter = new TestReporter()
-  override val tracing: Tracing = Tracing.newBuilder().reporter(reporter).build()
+  override val tracing: Tracing = Tracing.newBuilder().spanReporter(reporter).build()
 }
 
 class TestReporter extends Reporter[Span] {
