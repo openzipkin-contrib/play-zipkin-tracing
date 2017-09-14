@@ -4,14 +4,14 @@ name := """zipkin-akka-actor"""
 
 version := "1.0-SNAPSHOT"
 
-scalaVersion := "2.12.2"
+scalaVersion := "2.12.3"
 
 // TODO temporary
 resolvers += "Akka Snapshot Repository" at "http://repo.akka.io/snapshots/"
 resolvers += Resolver.mavenLocal
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "1.4.0",
+  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "2.0.0-SNAPSHOT",
   "com.typesafe.akka" %% "akka-actor" % "2.5.3"
 )
 
