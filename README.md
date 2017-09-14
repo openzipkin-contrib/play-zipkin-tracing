@@ -5,19 +5,19 @@ Provides distributed tracing for Play Framework using [Zipkin](http://zipkin.io/
 
 ## Supported versions
 
-- [Akka 2.5.3](play-zipkin-tracing/akka/README.md)
-- [Play 2.6](play-zipkin-tracing/play26/README.md)
-- [Play 2.5](play-zipkin-tracing/play25/README.md)
-- [Play 2.4](play-zipkin-tracing/play24/README.md)
-- [Play 2.3](play-zipkin-tracing/play23/README.md)
+- [Akka 2.5.3](play-zipkin-tracing/akka/README.md) (Zipkin1 and Zipkin2 support are available)
+- [Play 2.6](play-zipkin-tracing/play26/README.md) (Zipkin1 and Zipkin2 support are available)
+- [Play 2.5](play-zipkin-tracing/play25/README.md) (Only Zipkin1 support is available)
+- [Play 2.4](play-zipkin-tracing/play24/README.md) (Only Zipkin1 support is available)
+- [Play 2.3](play-zipkin-tracing/play23/README.md) (Only Zipkin1 support is available)
 
 ## Sample projects
 
-- [zipkin-akka-actor](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-akka-actor)
-- [zipkin-api-play26](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play26)
-- [zipkin-api-play25](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play25)
-- [zipkin-api-play24](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play24)
-- [zipkin-api-play23](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play23)
+- [zipkin-akka-actor](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-akka-actor) (Zipkin2)
+- [zipkin-api-play26](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play26) (Zipkin2)
+- [zipkin-api-play25](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play25) (Zipkin1)
+- [zipkin-api-play24](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play24) (Zipkin1)
+- [zipkin-api-play23](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play23) (Zipkin1)
 
 ### How to run sample projects
 
