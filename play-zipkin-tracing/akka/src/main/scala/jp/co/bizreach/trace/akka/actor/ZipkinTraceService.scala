@@ -25,11 +25,11 @@ class ZipkinTraceService(
 
   implicit val executionContext: ExecutionContext = actorSystem.dispatchers.lookup(ZipkinTraceConfig.AkkaName)
 
-  private val sender = OkHttpSender.create(baseUrl + "/api/v1/spans")
+  private val sender = OkHttpSender.json(baseUrl + "/api/v2/spans")
 
   val tracing = Tracing.newBuilder()
     .localServiceName(serviceName)
-    .reporter(AsyncReporter.builder(sender).build())
+    .spanReporter(AsyncReporter.v2(sender))
     .sampler(sampleRate.map(x => Sampler.create(x)) getOrElse Sampler.ALWAYS_SAMPLE)
     .build()
 

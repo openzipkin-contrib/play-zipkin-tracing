@@ -26,12 +26,9 @@ class ZipkinTraceService @Inject() (
 
   val tracing = Tracing.newBuilder()
     .localServiceName(conf.getOptional[String](ZipkinTraceConfig.ServiceName) getOrElse "unknown")
-    .reporter(AsyncReporter
-      .builder(OkHttpSender.create(
-        (conf.getOptional[String](ZipkinTraceConfig.ZipkinBaseUrl) getOrElse "http://localhost:9411") + "/api/v1/spans"
-      ))
-      .build()
-    )
+    .spanReporter(AsyncReporter.builder(OkHttpSender.json(
+        (conf.getOptional[String](ZipkinTraceConfig.ZipkinBaseUrl) getOrElse "http://localhost:9411") + "/api/v2/spans"
+      )).buildV2())
     .sampler(conf.getOptional[String](ZipkinTraceConfig.ZipkinSampleRate)
       .map(s => Sampler.create(s.toFloat)) getOrElse Sampler.ALWAYS_SAMPLE
     )
