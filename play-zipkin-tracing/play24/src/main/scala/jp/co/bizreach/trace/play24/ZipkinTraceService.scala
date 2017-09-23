@@ -7,8 +7,8 @@ import brave.Tracing
 import brave.sampler.Sampler
 import jp.co.bizreach.trace.{ZipkinTraceConfig, ZipkinTraceServiceLike}
 import play.api.Configuration
-import zipkin.reporter.AsyncReporter
-import zipkin.reporter.okhttp3.OkHttpSender
+import zipkin2.reporter.AsyncReporter
+import zipkin2.reporter.okhttp3.OkHttpSender
 
 import scala.concurrent.ExecutionContext
 

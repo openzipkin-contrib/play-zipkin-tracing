@@ -4,7 +4,7 @@ import brave.Tracing
 import brave.internal.HexCodec
 import org.scalatest.FunSuite
 import zipkin2.Span
-import zipkin.reporter.Reporter
+import zipkin2.reporter.Reporter
 
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration

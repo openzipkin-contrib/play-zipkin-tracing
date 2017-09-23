@@ -4,8 +4,8 @@ import akka.actor.ActorSystem
 import brave.Tracing
 import brave.sampler.Sampler
 import jp.co.bizreach.trace.{ZipkinTraceConfig, ZipkinTraceServiceLike}
-import zipkin.reporter.AsyncReporter
-import zipkin.reporter.okhttp3.OkHttpSender
+import zipkin2.reporter.AsyncReporter
+import zipkin2.reporter.okhttp3.OkHttpSender
 
 import scala.concurrent.ExecutionContext
 
@@ -25,11 +25,11 @@ class ZipkinTraceService(
 
   implicit val executionContext: ExecutionContext = actorSystem.dispatchers.lookup(ZipkinTraceConfig.AkkaName)
 
-  private val sender = OkHttpSender.json(baseUrl + "/api/v2/spans")
+  private val sender = OkHttpSender.create(baseUrl + "/api/v2/spans")
 
   val tracing = Tracing.newBuilder()
     .localServiceName(serviceName)
-    .spanReporter(AsyncReporter.v2(sender))
+    .spanReporter(AsyncReporter.create(sender))
     .sampler(sampleRate.map(x => Sampler.create(x)) getOrElse Sampler.ALWAYS_SAMPLE)
     .build()
 

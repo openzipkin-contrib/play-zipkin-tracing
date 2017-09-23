@@ -5,8 +5,8 @@ import brave.sampler.Sampler
 import jp.co.bizreach.trace._
 import play.api.{Play, Configuration}
 import play.api.libs.concurrent.Akka
-import zipkin.reporter.AsyncReporter
-import zipkin.reporter.okhttp3.OkHttpSender
+import zipkin2.reporter.AsyncReporter
+import zipkin2.reporter.okhttp3.OkHttpSender
 
 import scala.concurrent.ExecutionContext
 
@@ -21,11 +21,10 @@ object ZipkinTraceService extends ZipkinTraceServiceLike {
 
   val tracing = Tracing.newBuilder()
     .localServiceName(conf.getString(ZipkinTraceConfig.ServiceName) getOrElse "unknown")
-    .reporter(AsyncReporter
-      .builder(OkHttpSender.create(
-        (conf.getString(ZipkinTraceConfig.ZipkinBaseUrl) getOrElse "http://localhost:9411") + "/api/v1/spans"
+    .spanReporter(AsyncReporter
+      .create(OkHttpSender.create(
+        (conf.getString(ZipkinTraceConfig.ZipkinBaseUrl) getOrElse "http://localhost:9411") + "/api/v2/spans"
       ))
-      .build()
     )
     .sampler(conf.getString(ZipkinTraceConfig.ZipkinSampleRate)
       .map(s => Sampler.create(s.toFloat)) getOrElse Sampler.ALWAYS_SAMPLE
