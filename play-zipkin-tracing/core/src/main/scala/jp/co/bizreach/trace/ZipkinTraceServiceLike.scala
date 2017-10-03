@@ -1,6 +1,6 @@
 package jp.co.bizreach.trace
 
-import brave.propagation.TraceContext
+import brave.propagation.{Propagation, TraceContext}
 import brave.{Span, Tracer, Tracing}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -38,8 +38,10 @@ trait ZipkinTraceServiceLike {
   // used by a tracer report data to Zipkin
   implicit val executionContext: ExecutionContext
   val tracing: Tracing
+  val mapInjector = tracing.propagation().injector(ZipkinTraceServiceLike.mapSetter)
 
   private def tracer: Tracer = tracing.tracer
+
 
   /**
    * Creates a new client span within an existing trace and reports the span complete.
@@ -180,9 +182,7 @@ trait ZipkinTraceServiceLike {
   private[trace] def toMap(span: Span): Map[String, String] = {
     val data = collection.mutable.Map[String, String]()
 
-    tracing.propagation().injector(
-      (carrier: collection.mutable.Map[String, String], key: String, value: String) => carrier += key -> value
-    ).inject(span.context(), data)
+    mapInjector.inject(span.context(), data)
 
     data.toMap
   }
@@ -197,4 +197,8 @@ trait ZipkinTraceServiceLike {
     toMap(traceData.span)
   }
 
+}
+object ZipkinTraceServiceLike {
+  val mapSetter: Propagation.Setter[collection.mutable.Map[String, String], String] =
+    (carrier, key, value) => carrier += key -> value
 }

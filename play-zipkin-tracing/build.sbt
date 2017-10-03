@@ -63,11 +63,13 @@ lazy val core = (project in file("core")).
     name := "play-zipkin-tracing-core",
     libraryDependencies ++= Seq(
       "commons-lang" % "commons-lang" % "2.6",
-      "io.zipkin.brave" % "brave" % "4.8.0",
-      "io.zipkin.reporter2" % "zipkin-sender-okhttp3" % "2.0.0",
-      "org.scalatest" %% "scalatest" % "3.0.3" % "test"
+      "io.zipkin.brave" % "brave" % "4.8.1",
+      "io.zipkin.reporter2" % "zipkin-sender-okhttp3" % "2.0.2",
+      "org.scalatest" %% "scalatest" % "3.0.3" % "test",
+      "io.zipkin.brave" % "brave-tests" % "4.8.1" % "test"
     )
   )
+// TODO: make sbt run junit tests
 
 lazy val akka = (project in file("akka")).
   settings(commonSettings: _*).
