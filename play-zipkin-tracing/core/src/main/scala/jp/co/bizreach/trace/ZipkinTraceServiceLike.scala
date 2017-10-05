@@ -38,7 +38,7 @@ trait ZipkinTraceServiceLike {
   // used by a tracer report data to Zipkin
   implicit val executionContext: ExecutionContext
   val tracing: Tracing
-  val mapInjector = tracing.propagation().injector(ZipkinTraceServiceLike.mapSetter)
+  lazy val mapInjector = tracing.propagation().injector(ZipkinTraceServiceLike.mapSetter)
 
   private def tracer: Tracer = tracing.tracer
 
