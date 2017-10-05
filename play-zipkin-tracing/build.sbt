@@ -66,8 +66,11 @@ lazy val core = (project in file("core")).
       "io.zipkin.brave" % "brave" % "4.8.1",
       "io.zipkin.reporter2" % "zipkin-sender-okhttp3" % "2.0.2",
       "org.scalatest" %% "scalatest" % "3.0.3" % "test",
-      "io.zipkin.brave" % "brave-tests" % "4.8.1" % "test"
-    )
+      "io.zipkin.brave" % "brave-tests" % "4.8.1" % "test",
+      "junit" % "junit" % "4.12" % "test",
+      "com.novocode" % "junit-interface" % "0.11" % "test"
+    ),
+    testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
   )
 // TODO: make sbt run junit tests
 
