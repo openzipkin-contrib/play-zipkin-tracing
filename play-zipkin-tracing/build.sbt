@@ -72,7 +72,6 @@ lazy val core = (project in file("core")).
     ),
     testOptions += Tests.Argument(TestFrameworks.JUnit, "-q", "-v")
   )
-// TODO: make sbt run junit tests
 
 lazy val akka = (project in file("akka")).
   settings(commonSettings: _*).
