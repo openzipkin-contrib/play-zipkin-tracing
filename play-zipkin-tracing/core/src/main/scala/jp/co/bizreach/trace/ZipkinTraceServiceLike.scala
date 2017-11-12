@@ -21,8 +21,8 @@ import scala.util.{Failure, Success, Try}
  *   // configure a reporter, now create a tracing component
  *   val tracing = Tracing.newBuilder()
  *     .localServiceName("example")
- *     .reporter(AsyncReporter
- *       .builder(OkHttpSender.create("http://localhost:9411/api/v1/spans"))
+ *     .spanReporter(AsyncReporter
+ *       .builder(OkHttpSender.create("http://localhost:9411/api/v2/spans"))
  *       .build()
  *     )
  *     .sampler(Sampler.create(0.1F))
