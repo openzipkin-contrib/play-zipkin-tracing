@@ -63,10 +63,10 @@ lazy val core = (project in file("core")).
     name := "play-zipkin-tracing-core",
     libraryDependencies ++= Seq(
       "commons-lang" % "commons-lang" % "2.6",
-      "io.zipkin.brave" % "brave" % "4.9.2",
-      "io.zipkin.reporter2" % "zipkin-sender-okhttp3" % "2.1.4",
+      "io.zipkin.brave" % "brave" % "4.12.0",
+      "io.zipkin.reporter2" % "zipkin-sender-okhttp3" % "2.2.0",
       "org.scalatest" %% "scalatest" % "3.0.3" % "test",
-      "io.zipkin.brave" % "brave-tests" % "4.9.2" % "test",
+      "io.zipkin.brave" % "brave-tests" % "4.12.0" % "test",
       "junit" % "junit" % "4.12" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test"
     ),
