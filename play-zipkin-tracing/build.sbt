@@ -90,7 +90,8 @@ lazy val play26 = (project in file("play26")).
     name := "play-zipkin-tracing-play26",
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play" % play26Version % Provided,
-      "com.typesafe.play" %% "play-ws" % play26Version % Provided
+      "com.typesafe.play" %% "play-ws" % play26Version % Provided,
+      "com.typesafe.play" %% "play-guice" % play26Version % Test
     )
   ).dependsOn(
     core % "test->test;compile->compile",
