@@ -3,6 +3,7 @@ package jp.co.bizreach.trace.play26.module
 import java.util.Collections
 
 import brave.Tracing
+import brave.http.HttpTracing
 import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import jp.co.bizreach.trace.play26.ZipkinTraceService
 import org.scalatest.AsyncFlatSpec
@@ -10,7 +11,6 @@ import play.api.inject.ApplicationLifecycle
 import play.api.inject.guice.GuiceApplicationBuilder
 import zipkin2.reporter.Sender
 import zipkin2.reporter.okhttp3.OkHttpSender
-
 
 class ZipkinModuleSpec extends AsyncFlatSpec {
   val injector = new GuiceApplicationBuilder()
@@ -47,15 +47,23 @@ class ZipkinModuleSpec extends AsyncFlatSpec {
 
     // stopping the application should close the tracing component!
     injector.instanceOf[ApplicationLifecycle].stop map { _ => {
-      assert(Tracing.current() == null)
+      val currentTracing = Tracing.current()
+      assert(currentTracing == null || currentTracing != tracing)
 
     }
     }
   }
 
+  it should "provide an http tracing component" in {
+    val httpTracing = injector.instanceOf[HttpTracing]
+    assert(httpTracing.tracing() == injector.instanceOf[Tracing])
+  }
+
   it should "provide a zipkin trace service" in {
-    // TODO: dies due to missing dispatcher
     val service = injector.instanceOf[ZipkinTraceServiceLike]
     assert(service.isInstanceOf[ZipkinTraceService])
+
+    assert(service.tracing == injector.instanceOf[Tracing])
+    assert(service.httpTracing == injector.instanceOf[HttpTracing])
   }
 }

@@ -1,8 +1,9 @@
 package jp.co.bizreach.trace
 
 import brave.Tracing
+import brave.http.HttpTracing
 import brave.internal.HexCodec
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfter, FunSuite}
 import zipkin2.Span
 import zipkin2.reporter.Reporter
 
@@ -10,8 +11,14 @@ import scala.collection.mutable.ListBuffer
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
+class ZipkinTraceServiceLikeSpec extends FunSuite with BeforeAndAfter {
+  val reporter = new TestReporter()
+  val tracer = new TestZipkinTraceService(Tracing.newBuilder().spanReporter(reporter).build())
 
-class ZipkinTraceServiceLikeSpec extends FunSuite {
+  after {
+    reporter.spans.clear()
+    if (Tracing.current() != null) Tracing.current().close()
+  }
 
   private def initialTraceData(tracer: ZipkinTraceServiceLike, header: Map[String, String]): TraceData = {
     TraceData(tracer.newSpan[Map[String, String]](header)(getValueFromMap _))
@@ -20,7 +27,6 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
   private def getValueFromMap(map: Map[String, String], key: String): Option[String] = map.get(key)
 
   test("Nested local synchronous tracing"){
-    val tracer = new TestZipkinTraceService()
     implicit val traceData = initialTraceData(tracer, Map.empty)
 
     tracer.trace("trace-1"){ implicit traceData =>
@@ -29,10 +35,10 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
       }
     }
 
-    assert(tracer.reporter.spans.length == 2)
+    assert(reporter.spans.length == 2)
 
-    val parent = tracer.reporter.spans.find(_.name == "trace-1").get
-    val child  = tracer.reporter.spans.find(_.name == "trace-2").get
+    val parent = reporter.spans.find(_.name == "trace-1").get
+    val child  = reporter.spans.find(_.name == "trace-2").get
 
     assert(parent.id == child.parentId)
     assert(parent.id != child.id)
@@ -42,7 +48,6 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
   test("Future and a nested local synchronous process tracing") {
     import scala.concurrent.ExecutionContext.Implicits.global
 
-    val tracer = new TestZipkinTraceService()
     implicit val traceData = initialTraceData(tracer, Map.empty)
 
     val f = tracer.traceFuture("trace-future") { implicit traceData =>
@@ -56,9 +61,9 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
     Await.result(f, Duration.Inf)
     Thread.sleep(100) // wait for callback completion
 
-    assert(tracer.reporter.spans.length == 2)
-    val parent = tracer.reporter.spans.find(_.name == "trace-future").get
-    val child  = tracer.reporter.spans.find(_.name == "trace-sync").get
+    assert(reporter.spans.length == 2)
+    val parent = reporter.spans.find(_.name == "trace-future").get
+    val child  = reporter.spans.find(_.name == "trace-sync").get
 
     assert(parent.duration >= 500)
     assert(parent.id == child.parentId)
@@ -67,8 +72,6 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
   }
 
   test("Create span") {
-    val tracer = new TestZipkinTraceService()
-
     // create root span
     val parent = tracer.newSpan[Map[String, String]](Map.empty)(getValueFromMap _)
     assert(parent.context().parentId() == null)
@@ -85,8 +88,6 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
   }
 
   test("Receive and send server span") {
-    val tracer = new TestZipkinTraceService()
-
     // create root span
     val span = tracer.newSpan[Map[String, String]](Map.empty)(getValueFromMap _)
 
@@ -94,9 +95,9 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
     Thread.sleep(500)
     tracer.serverSend(span, "tag" -> "value")
 
-    assert(tracer.reporter.spans.length == 1)
+    assert(reporter.spans.length == 1)
 
-    val reported = tracer.reporter.spans.find(_.name() == "server-span").get
+    val reported = reporter.spans.find(_.name() == "server-span").get
     assert(reported.name() == "server-span")
     assert(reported.duration() >= 500)
     assert(reported.tags().size() == 1)
@@ -105,10 +106,8 @@ class ZipkinTraceServiceLikeSpec extends FunSuite {
 
 }
 
-class TestZipkinTraceService extends ZipkinTraceServiceLike {
+class TestZipkinTraceService(override val tracing: Tracing) extends ZipkinTraceServiceLike {
   override implicit val executionContext: ExecutionContext = ExecutionContext.global
-  val reporter = new TestReporter()
-  override val tracing: Tracing = Tracing.newBuilder().spanReporter(reporter).build()
 }
 
 class TestReporter extends Reporter[Span] {
