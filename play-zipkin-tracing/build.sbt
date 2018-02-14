@@ -1,3 +1,5 @@
+resolvers in Global += Resolver.mavenLocal
+
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
   version := "2.0.1",
@@ -63,11 +65,11 @@ lazy val core = (project in file("core")).
     name := "play-zipkin-tracing-core",
     libraryDependencies ++= Seq(
       "commons-lang" % "commons-lang" % "2.6",
-      "io.zipkin.brave" % "brave" % "4.15.1",
-      "io.zipkin.brave" % "brave-instrumentation-http" % "4.15.1",
-      "io.zipkin.reporter2" % "zipkin-sender-okhttp3" % "2.3.2",
+      "io.zipkin.brave" % "brave" % "4.16.1",
+      "io.zipkin.brave" % "brave-instrumentation-http" % "4.16.1",
+      "io.zipkin.reporter2" % "zipkin-sender-okhttp3" % "2.3.3",
       "org.scalatest" %% "scalatest" % "3.0.3" % "test",
-      "io.zipkin.brave" % "brave-tests" % "4.15.1" % "test",
+      "io.zipkin.brave" % "brave-tests" % "4.16.1" % "test",
       "junit" % "junit" % "4.12" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test"
     ),
@@ -94,7 +96,7 @@ lazy val play26 = (project in file("play26")).
       "com.typesafe.play" %% "play-ws" % play26Version % Provided,
       "com.typesafe.play" %% "play-test" % play26Version % Test,
       "com.typesafe.play" %% "play-guice" % play26Version % Test,
-      "io.zipkin.brave" % "brave-instrumentation-http-tests" % "4.15.1" % Test
+      "io.zipkin.brave" % "brave-instrumentation-http-tests" % "4.16.1" % Test
     )
   ).dependsOn(
     core % "test->test;compile->compile",

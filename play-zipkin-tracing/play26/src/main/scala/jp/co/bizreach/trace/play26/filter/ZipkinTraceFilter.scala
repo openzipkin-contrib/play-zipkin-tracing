@@ -7,6 +7,7 @@ import brave.http.{HttpServerAdapter, HttpServerHandler}
 import brave.propagation.Propagation.Getter
 import brave.propagation.TraceContext
 import jp.co.bizreach.trace.ZipkinTraceServiceLike
+import org.apache.commons.lang3.StringUtils
 import play.api.mvc.{Filter, Headers, RequestHeader, Result}
 import play.api.routing.Router
 import zipkin2.Endpoint
@@ -31,7 +32,6 @@ import scala.util.{Failure, Success}
 class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val mat: Materializer) extends Filter {
 
   import tracer.executionContext
-  private val reqHeaderToSpanName: RequestHeader => String = ZipkinTraceFilter.ParamAwareRequestNamer
 
   // TODO: any way to get rid of this asInstanceOf?
   private val handler: HttpServerHandler[RequestHeader, Result] =
@@ -41,6 +41,8 @@ class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val 
     tracer.httpTracing.tracing.propagation.extractor(ZipkinTraceFilter.headerGetter)
 
   def apply(nextFilter: (RequestHeader) => Future[Result])(req: RequestHeader): Future[Result] = {
+    var template = req.attrs.get(Router.Attrs.HandlerDef).map(_.path)
+    // TODO ^^ is always None! is it being read too soon?
     val span = handler.handleReceive(extractor, req.headers, req)
 
     // invoke the next filter with this span in scope
@@ -53,7 +55,14 @@ class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val 
 
     result.onComplete {
       case Failure(t) => handler.handleSend(null, t, span)
-      case Success(r) => handler.handleSend(r, null, span)
+      case Success(r) =>
+        // add synthetic headers for route-based naming
+        handler.handleSend(r.withHeaders(
+          "brave-http-method" -> req.method,
+          "brave-http-template" -> template.map(t =>
+            StringUtils.replace(t, "<[^/]+>", "")
+          ).getOrElse("")
+        ), null, span)
     }
     result
   }
@@ -66,6 +75,12 @@ class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val 
 
     override def requestHeader(req: RequestHeader, name: String) = req.headers.get(name).orNull
 
+    override def methodFromResponse(response: Result): String =
+      response.header.headers.apply("brave-http-method")
+
+    override def route(response: Result): String =
+      response.header.headers.apply("brave-http-template")
+
     override def statusCode(response: Result) = response.header.status
 
     override def parseClientAddress(req: RequestHeader, builder: Endpoint.Builder): Boolean = {
@@ -77,12 +92,4 @@ class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val 
 
 object ZipkinTraceFilter {
   val headerGetter: Getter[Headers, String] = (headers, key) => headers.get(key).orNull
-  val ParamAwareRequestNamer: RequestHeader => String = { reqHeader =>
-    import org.apache.commons.lang3.StringUtils
-    val pathPattern = StringUtils.replace(
-      reqHeader.attrs.get(Router.Attrs.HandlerDef).map(_.path).getOrElse(reqHeader.path),
-      "<[^/]+>", ""
-    )
-    s"${reqHeader.method} - $pathPattern"
-  }
 }

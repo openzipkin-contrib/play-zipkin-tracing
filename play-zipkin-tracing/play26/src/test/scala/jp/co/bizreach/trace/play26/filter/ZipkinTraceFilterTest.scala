@@ -25,6 +25,10 @@ class TestRouter @Inject()(
   import zipkin.executionContext
 
   override def routes: Routes = {
+    case OPTIONS(p"/") => Action {
+      Results.Ok("bar")
+    }
+
     case GET(p"/foo") => Action {
       Results.Ok("bar")
     }
@@ -61,6 +65,11 @@ class TestRouter @Inject()(
         Results.Ok("This page will generate an error!")
       }
     }
+
+    case GET(p"/items/$itemId<[0-9]+>") => Action {
+      Results.Ok(itemId)
+    }
+      // TODO: how do I make a nested route? Ex "/nested" -> GET(p"/items/$itemId<[0-9]+>")
   }
 }
 
