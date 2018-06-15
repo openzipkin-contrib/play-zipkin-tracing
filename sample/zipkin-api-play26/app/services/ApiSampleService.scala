@@ -6,7 +6,6 @@ import jp.co.bizreach.trace.{TraceData, ZipkinTraceServiceLike}
 import repositories.ApiRepository
 
 import scala.concurrent.Future
-import scala.util.Random
 
 /**
   * Created by nishiyama on 2016/12/05.
