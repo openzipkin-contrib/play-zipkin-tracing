@@ -1,8 +1,9 @@
 package jp.co.bizreach.trace.play26.module
 
-import javax.inject.{Inject, Provider}
+import javax.inject.{Inject, Provider, Singleton}
 
 import brave.Tracing
+import brave.http.HttpTracing
 import brave.sampler.Sampler
 import jp.co.bizreach.trace.play26.ZipkinTraceService
 import jp.co.bizreach.trace.{ZipkinTraceConfig, ZipkinTraceServiceLike}
@@ -24,8 +25,9 @@ import scala.concurrent.Future
   */
 class ZipkinModule extends SimpleModule((env, conf) =>
   Seq(
-    bind[Sender].toProvider(classOf[SenderProvider]),
-    bind[Tracing].toProvider(classOf[TracingProvider]),
+    bind[Sender].toProvider(classOf[SenderProvider]).in(classOf[Singleton]),
+    bind[Tracing].toProvider(classOf[TracingProvider]).in(classOf[Singleton]),
+    bind[HttpTracing].toProvider(classOf[HttpTracingProvider]).in(classOf[Singleton]),
     bind[ZipkinTraceServiceLike].to[ZipkinTraceService]
   )
 )
@@ -58,5 +60,15 @@ class TracingProvider @Inject()(sender: Provider[Sender],
       .build()
     lifecycle.addStopHook(() => Future.successful(result.close()))
     result
+  }
+}
+
+class HttpTracingProvider @Inject()(sender: Provider[Tracing],
+                                    conf: Configuration,
+                                    lifecycle: ApplicationLifecycle)
+  extends Provider[HttpTracing] {
+
+  override def get(): HttpTracing = {
+    HttpTracing.create(sender.get())
   }
 }

@@ -1,5 +1,6 @@
 package jp.co.bizreach.trace
 
+import brave.http.HttpTracing
 import brave.propagation.{Propagation, TraceContext}
 import brave.{Span, Tracer, Tracing}
 
@@ -38,7 +39,8 @@ trait ZipkinTraceServiceLike {
   // used by a tracer report data to Zipkin
   implicit val executionContext: ExecutionContext
   val tracing: Tracing
-  lazy val mapInjector = tracing.propagation().injector(ZipkinTraceServiceLike.mapSetter)
+  val httpTracing = HttpTracing.create(tracing)
+  val mapInjector = tracing.propagation().injector(ZipkinTraceServiceLike.mapSetter)
 
   private def tracer: Tracer = tracing.tracer
 
