@@ -1,8 +1,7 @@
 lazy val commonSettings = Seq(
   organization := "jp.co.bizreach",
-  version := "2.0.1",
+  version := "2.1.0-SNAPSHOT",
   scalaVersion := "2.12.6",
-//  crossScalaVersions := Seq("2.11.8", "2.12.2"),
   publishMavenStyle := true,
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
@@ -42,11 +41,7 @@ lazy val commonSettings = Seq(
   )
 )
 
-val play26Version = "2.6.15"
-//val play25Version = "2.5.7"
-//val play24Version = "2.4.8"
-//val play23Version = "2.3.10"
-
+val playVersion = "2.6.15"
 val akkaVersion = "2.5.11"
 
 lazy val root = (project in file(".")).
@@ -55,7 +50,7 @@ lazy val root = (project in file(".")).
     name := "play-zipkin-tracing",
     publishArtifact := false
   ).
-  aggregate(core, akka, play26)
+  aggregate(core, akka, play)
 
 lazy val core = (project in file("core")).
   settings(commonSettings: _*).
@@ -84,48 +79,16 @@ lazy val akka = (project in file("akka")).
     core % "test->test;compile->compile"
   )
 
-lazy val play26 = (project in file("play26")).
+lazy val play = (project in file("play")).
   settings(commonSettings: _*).
   settings(
-    name := "play-zipkin-tracing-play26",
+    name := "play-zipkin-tracing-play",
     libraryDependencies ++= Seq(
-      "com.typesafe.play" %% "play" % play26Version % Provided,
-      "com.typesafe.play" %% "play-ws" % play26Version % Provided,
-      "com.typesafe.play" %% "play-guice" % play26Version % Test
+      "com.typesafe.play" %% "play" % playVersion % Provided,
+      "com.typesafe.play" %% "play-ws" % playVersion % Provided,
+      "com.typesafe.play" %% "play-guice" % playVersion % Test
     )
   ).dependsOn(
     core % "test->test;compile->compile",
     akka % "test->test;compile->compile"
   )
-
-//lazy val play25 = (project in file("play25")).
-//  settings(commonSettings: _*).
-//  settings(
-//    name := "play-zipkin-tracing-play25",
-//    libraryDependencies ++= Seq(
-//      "com.typesafe.play" %% "play" % play25Version % Provided,
-//      "com.typesafe.play" %% "play-ws" % play25Version % Provided
-//    )
-//  ).dependsOn(core % "test->test;compile->compile")
-//
-//lazy val play24 = (project in file("play24")).
-//  settings(commonSettings: _*).
-//  settings(
-//    name := "play-zipkin-tracing-play24",
-//    libraryDependencies ++= Seq(
-//      "com.typesafe.play" %% "play" % play24Version % Provided,
-//      "com.typesafe.play" %% "play-ws" % play24Version % Provided
-//    )
-//  ).dependsOn(core % "test->test;compile->compile")
-//
-//
-//lazy val play23 = (project in file("play23")).
-//  settings(commonSettings: _*).
-//  settings(
-//    name := "play-zipkin-tracing-play23",
-//    libraryDependencies ++= Seq(
-//      "com.typesafe.play" %% "play" % play23Version % Provided,
-//      "com.typesafe.play" %% "play-ws" % play23Version % Provided
-//    ),
-//    resolvers += "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/"
-//  ).dependsOn(core % "test->test;compile->compile")
