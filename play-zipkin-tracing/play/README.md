@@ -9,7 +9,7 @@ Add following dependency to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "2.0.1"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play" % "2.1.0"
 )
 ```
 
@@ -34,7 +34,7 @@ zipkin-trace-context {
   }
 }
 
-play.modules.enabled  += "jp.co.bizreach.trace.play26.module.ZipkinModule"
+play.modules.enabled  += "jp.co.bizreach.trace.play.module.ZipkinModule"
 ```
 
 ## Usage
@@ -45,7 +45,7 @@ Inject `ZipkinTraceFilter` to `filter.Filters`:
 package filters
 
 import javax.inject.Inject
-import jp.co.bizreach.trace.play25.filter.ZipkinTraceFilter
+import jp.co.bizreach.trace.play.filter.ZipkinTraceFilter
 import play.api.http.DefaultHttpFilters
 
 class Filters @Inject() (
@@ -61,8 +61,8 @@ package controllers
 
 import play.api.mvc._
 import play.api.libs.json.Json
-import jp.co.bizreach.trace.play26.{TraceWSClient, ZipkinTraceService}
-import jp.co.bizreach.trace.play26.implicits.ZipkinTraceImplicits
+import jp.co.bizreach.trace.play.{TraceWSClient, ZipkinTraceService}
+import jp.co.bizreach.trace.play.implicits.ZipkinTraceImplicits
 import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 
