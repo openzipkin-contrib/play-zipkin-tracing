@@ -7,8 +7,8 @@ version := "1.0-SNAPSHOT"
 scalaVersion := "2.12.4"
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "2.0.1",
-  "com.typesafe.akka" %% "akka-actor" % "2.5.8"
+  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "2.1.0",
+  "com.typesafe.akka" %% "akka-actor" % "2.5.11"
 )
 
 scalacOptions ++= Seq(

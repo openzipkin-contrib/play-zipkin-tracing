@@ -15,10 +15,8 @@ libraryDependencies ++= Seq(
   guice
 )
 
-val AkkaVersion = "2.5.8"
-
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play26" % "2.0.1"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play" % "2.1.0"
 )
 
 PlayKeys.playDefaultPort := 9991

@@ -14,7 +14,7 @@ import akka.util.Timeout
 
 import scala.concurrent.{ExecutionContext, Future}
 import jp.co.bizreach.trace.ZipkinTraceServiceLike
-import jp.co.bizreach.trace.play26.implicits.ZipkinTraceImplicits
+import jp.co.bizreach.trace.play.implicits.ZipkinTraceImplicits
 
 /**
   * Created by nishiyama on 2016/12/05.
