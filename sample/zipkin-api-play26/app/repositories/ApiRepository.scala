@@ -2,9 +2,9 @@ package repositories
 
 import javax.inject.Inject
 
-import jp.co.bizreach.trace.play26.TraceWSClient
+import jp.co.bizreach.trace.play.TraceWSClient
 import jp.co.bizreach.trace.{TraceData, ZipkinTraceServiceLike}
-import jp.co.bizreach.trace.play26.implicits.ZipkinTraceImplicits
+import jp.co.bizreach.trace.play.implicits.ZipkinTraceImplicits
 import play.api.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
