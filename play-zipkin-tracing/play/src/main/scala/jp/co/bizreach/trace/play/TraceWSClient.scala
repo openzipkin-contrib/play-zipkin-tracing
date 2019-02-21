@@ -48,7 +48,7 @@ private class TraceWSRequest(spanName: String, request: WSRequest, tracer: Zipki
   override val calc: Option[WSSignatureCalculator] = request.calc
   override val auth: Option[(String, String, WSAuthScheme)] = request.auth
   override val followRedirects: Option[Boolean] = request.followRedirects
-  override val requestTimeout: Option[Int] = request.requestTimeout
+  override val requestTimeout: Option[Duration] = request.requestTimeout
   override val virtualHost: Option[String] = request.virtualHost
   override val proxyServer: Option[WSProxyServer] = request.proxyServer
 
@@ -63,6 +63,7 @@ private class TraceWSRequest(spanName: String, request: WSRequest, tracer: Zipki
   override def withRequestFilter(filter: WSRequestFilter): TraceWSRequest = new TraceWSRequest(spanName, request.withRequestFilter(filter), tracer, traceData)
   override def withVirtualHost(vh: String): TraceWSRequest = new TraceWSRequest(spanName, request.withVirtualHost(vh), tracer, traceData)
   override def withProxyServer(proxyServer: WSProxyServer): TraceWSRequest = new TraceWSRequest(spanName, request.withProxyServer(proxyServer), tracer, traceData)
+  override def withUrl(url: String): TraceWSRequest = new TraceWSRequest(spanName, request.withUrl(url), tracer, traceData)
   override def withMethod(method: String): TraceWSRequest = new TraceWSRequest(spanName, request.withMethod(method), tracer, traceData)
 
   override def execute(): Future[Response] = tracer.traceFuture(spanName){ data =>

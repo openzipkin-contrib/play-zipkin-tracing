@@ -1,12 +1,13 @@
-package jp.co.bizreach.trace.play.module
+package jp.co.bizreach.trace.module
 
 import java.util.Collections
 
+import akka.actor.CoordinatedShutdown
 import brave.Tracing
 import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import jp.co.bizreach.trace.play.ZipkinTraceService
+import jp.co.bizreach.trace.play.module.ZipkinModule
 import org.scalatest.AsyncFlatSpec
-import play.api.inject.ApplicationLifecycle
 import play.api.inject.guice.GuiceApplicationBuilder
 import zipkin2.reporter.Sender
 import zipkin2.reporter.okhttp3.OkHttpSender
@@ -27,29 +28,33 @@ class ZipkinModuleSpec extends AsyncFlatSpec {
     val sender = injector.instanceOf[Sender]
 
     // stopping the application should close the sender!
-    injector.instanceOf[ApplicationLifecycle].stop map { _ => {
+    injector.instanceOf[CoordinatedShutdown].run(CoordinatedShutdown.UnknownReason) map { _ =>
       val thrown = intercept[Exception] {
         sender.sendSpans(Collections.emptyList[Array[Byte]]).execute()
       }
       assert(thrown.getMessage === "closed")
     }
-    }
   }
 
-  it should "provide a tracing component" in {
-    val tracing = injector.instanceOf[Tracing]
+  it should "provide a tracing component" in instanceOfTracing { tracing =>
     assert(Tracing.current() != null)
+    assert(Tracing.current() == tracing)
   }
 
-  it should "eventually close the tracing component" in {
-    // provisioning the tracing component so we can tell if it is closed on shutdown
-    val tracing = injector.instanceOf[Tracing]
-
+  it should "eventually close the tracing component" in instanceOfTracing { tracing =>
     // stopping the application should close the tracing component!
-    injector.instanceOf[ApplicationLifecycle].stop map { _ => {
+    injector.instanceOf[CoordinatedShutdown].run(CoordinatedShutdown.UnknownReason) map { _ =>
       assert(Tracing.current() == null)
-
     }
+  }
+
+  private def instanceOfTracing[A](test: Tracing => A): A = {
+    val tracing = injector.instanceOf[Tracing]
+    try {
+      test(tracing)
+    } finally {
+      // Ensures there is no active Tracing object
+      tracing.close()
     }
   }
 

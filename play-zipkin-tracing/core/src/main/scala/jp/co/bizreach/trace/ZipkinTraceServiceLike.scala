@@ -139,7 +139,7 @@ trait ZipkinTraceServiceLike {
 
     Option(contextOrFlags.context())
       .map(tracer.newChild)
-      .getOrElse(tracer.newTrace(contextOrFlags.samplingFlags()))
+      .getOrElse(tracer.withSampler(tracing.sampler()).newTrace())
   }
 
   /**

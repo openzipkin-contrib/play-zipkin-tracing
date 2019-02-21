@@ -1,6 +1,7 @@
 package jp.co.bizreach.trace
 
-import brave.propagation.{Propagation, PropagationSetterTest}
+import brave.propagation.Propagation
+import brave.test.propagation.PropagationSetterTest
 
 /** Tests [[jp.co.bizreach.trace.ZipkinTraceServiceLike.mapSetter]] is a valid setter */
 class MapSetterTest extends PropagationSetterTest[collection.mutable.Map[String, String], String] {

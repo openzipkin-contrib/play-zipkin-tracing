@@ -29,7 +29,7 @@ class ZipkinTraceFilter @Inject() (tracer: ZipkinTraceServiceLike)(implicit val 
   import tracer.executionContext
   private val reqHeaderToSpanName: RequestHeader => String = ZipkinTraceFilter.ParamAwareRequestNamer
 
-  def apply(nextFilter: (RequestHeader) => Future[Result])(req: RequestHeader): Future[Result] = {
+  def apply(nextFilter: RequestHeader => Future[Result])(req: RequestHeader): Future[Result] = {
     val serverSpan = tracer.serverReceived(
       spanName = reqHeaderToSpanName(req),
       span = tracer.newSpan(req.headers)((headers, key) => headers.get(key))
