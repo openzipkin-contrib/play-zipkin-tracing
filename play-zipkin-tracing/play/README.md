@@ -61,9 +61,10 @@ package controllers
 
 import play.api.mvc._
 import play.api.libs.json.Json
+import jp.co.bizreach.trace.ZipkinTraceServiceLike
 import jp.co.bizreach.trace.play.{TraceWSClient, ZipkinTraceService}
 import jp.co.bizreach.trace.play.implicits.ZipkinTraceImplicits
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.Inject
 
 class ApiController @Inject()
