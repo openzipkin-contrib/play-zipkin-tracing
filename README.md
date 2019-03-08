@@ -6,7 +6,7 @@ Provides distributed tracing for Play Framework using [Zipkin](http://zipkin.io/
 ## Supported versions
 
 - [Akka 2.5.x](play-zipkin-tracing/akka/README.md) (Zipkin1 and Zipkin2 support are available)
-- [Play 2.6](play-zipkin-tracing/play/README.md) (Zipkin1 and Zipkin2 support are available)
+- [Play 2.6](https://github.com/bizreach/play-zipkin-tracing/blob/2.1.0/play-zipkin-tracing/play/README.md) (Zipkin1 and Zipkin2 support are available)
 
 ## Old versions (currently unsupported)
 

@@ -9,7 +9,7 @@ import jp.co.bizreach.trace.{ZipkinTraceConfig, ZipkinTraceServiceLike}
 import scala.concurrent.ExecutionContext
 
 /**
- * Class for Zipkin tracing at Play2.6.
+ * Class for Zipkin tracing at Play2.7.
  *
  * @param tracing a Play's configuration
  * @param actorSystem a Play's actor system
