@@ -1,15 +1,16 @@
 play-zipkin-tracing [![Build Status](https://travis-ci.org/bizreach/play-zipkin-tracing.svg?branch=master)](https://travis-ci.org/bizreach/play-zipkin-tracing)
 ========
 
-Provides distributed tracing for Play Framework using [Zipkin](http://zipkin.io/). It makes possible to trace HTTP calls between Play based microservices easily without performance degradation.
+Provides distributed tracing for Play Framework using [Zipkin](https://zipkin.io/). It makes possible to trace HTTP calls between Play based microservices easily without performance degradation.
 
 ## Supported versions
 
 - [Akka 2.5.x](play-zipkin-tracing/akka/README.md) (Zipkin1 and Zipkin2 support are available)
-- [Play 2.6](https://github.com/bizreach/play-zipkin-tracing/blob/2.1.0/play-zipkin-tracing/play/README.md) (Zipkin1 and Zipkin2 support are available)
+- [Play 2.7](play-zipkin-tracing/play/README.md) (Zipkin1 and Zipkin2 support are available)
 
 ## Old versions (currently unsupported)
 
+- [Play 2.6](https://github.com/bizreach/play-zipkin-tracing/blob/2.1.0/play-zipkin-tracing/play/README.md) (Zipkin1 and Zipkin2 support are available)
 - [Play 2.5](https://github.com/bizreach/play-zipkin-tracing/blob/1.2.0/play-zipkin-tracing/play25/README.md) (only Zipkin1 support is available)
 - [Play 2.4](https://github.com/bizreach/play-zipkin-tracing/blob/1.2.0/play-zipkin-tracing/play24/README.md) (only Zipkin1 support is available)
 - [Play 2.3](https://github.com/bizreach/play-zipkin-tracing/blob/1.2.0/play-zipkin-tracing/play23/README.md) (only Zipkin1 support is available)
