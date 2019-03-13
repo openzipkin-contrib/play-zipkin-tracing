@@ -1,15 +1,23 @@
 organization := "jp.co.bizreach"
 
-name := """zipkin-akka-actor"""
+name := """zipkin-api-play27"""
 
 version := "1.0-SNAPSHOT"
+
+lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.12.8"
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "2.2.0",
-  "com.typesafe.akka" %% "akka-actor" % "2.5.21"
+  ws,
+  guice
 )
+
+libraryDependencies ++= Seq(
+  "jp.co.bizreach" %% "play-zipkin-tracing-play" % "2.2.0"
+)
+
+PlayKeys.playDefaultPort := 9991
 
 scalacOptions ++= Seq(
   "-feature",
