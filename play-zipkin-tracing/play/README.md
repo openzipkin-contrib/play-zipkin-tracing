@@ -1,7 +1,7 @@
 play-zipkin-tracing-play
 ========
 
-A library to add tracing capability to Play 2.6 based microservices.
+A library to add tracing capability to Play 2.7 based microservices.
 
 ## Setup
 
@@ -9,7 +9,7 @@ Add following dependency to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play" % "2.1.0"
+  "jp.co.bizreach" %% "play-zipkin-tracing-play" % "2.2.0"
 )
 ```
 
