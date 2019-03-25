@@ -18,6 +18,7 @@ Provides distributed tracing for Play Framework using [Zipkin](https://zipkin.io
 ## Sample projects
 
 - [zipkin-akka-actor](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-akka-actor) (Zipkin2)
+- [zipkin-api-play27](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play27) (Zipkin2)
 - [zipkin-api-play26](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play26) (Zipkin2)
 - [zipkin-api-play25](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play25) (Zipkin1)
 - [zipkin-api-play24](https://github.com/bizreach/play-zipkin-tracing/tree/master/sample/zipkin-api-play24) (Zipkin1)
@@ -25,10 +26,10 @@ Provides distributed tracing for Play Framework using [Zipkin](https://zipkin.io
 
 ### How to run sample projects
 
-1. Run zipkin-api-play26 project
+1. Run zipkin-api-play27 project
 
   ```
-  $ cd sample/zipkin-api-play26
+  $ cd sample/zipkin-api-play27
   $ sbt run
   ```
 
