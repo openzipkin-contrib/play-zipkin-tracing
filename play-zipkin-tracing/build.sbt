@@ -1,6 +1,6 @@
 lazy val commonSettings = Seq(
-  organization := "jp.co.bizreach",
-  version := "2.2.1-SNAPSHOT",
+  organization := "io.zipkin.play",
+  version := "3.0.0-SNAPSHOT",
   scalaVersion := "2.12.8",
   crossScalaVersions := Seq(scalaVersion.value, "2.13.0-M5"),
   publishMavenStyle := true,
@@ -14,7 +14,7 @@ lazy val commonSettings = Seq(
   publishArtifact in Test := false,
   pomIncludeRepository := { _ => false },
   pomExtra := (
-    <url>https://github.com/bizreach/play-zipkin-tracing</url>
+    <url>https://github.com/openzipkin-contrib/play-zipkin-tracing</url>
     <licenses>
       <license>
         <name>The Apache Software License, Version 2.0</name>
@@ -22,14 +22,10 @@ lazy val commonSettings = Seq(
       </license>
     </licenses>
     <scm>
-      <url>https://github.com/bizreach/play-zipkin-tracing</url>
-      <connection>scm:git:https://github.com/bizreach/play-zipkin-tracing.git</connection>
+      <url>https://github.com/openzipkin-contrib/play-zipkin-tracing</url>
+      <connection>scm:git:https://github.com/openzipkin-contrib/play-zipkin-tracing.git</connection>
     </scm>
     <developers>
-      <developer>
-        <id>nishiyama</id>
-        <name>Hajime Nishiyama</name>
-      </developer>
       <developer>
         <id>shimamoto</id>
         <name>Takako Shimamoto</name>
