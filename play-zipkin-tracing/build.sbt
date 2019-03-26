@@ -1,5 +1,5 @@
 lazy val commonSettings = Seq(
-  organization := "io.zipkin.play",
+  organization := "io.zipkin.brave.play",
   version := "3.0.0-SNAPSHOT",
   scalaVersion := "2.12.8",
   crossScalaVersions := Seq(scalaVersion.value, "2.13.0-M5"),
