@@ -4,8 +4,8 @@ import java.util.concurrent.TimeUnit
 
 import akka.actor._
 import akka.util.Timeout
-import jp.co.bizreach.trace.ZipkinTraceServiceLike
-import jp.co.bizreach.trace.akka.actor.ActorTraceSupport._
+import brave.play.ZipkinTraceServiceLike
+import brave.play.actor.ActorTraceSupport._
 
 class HelloWorldActor(implicit val tracer: ZipkinTraceServiceLike) extends TraceableActor {
 

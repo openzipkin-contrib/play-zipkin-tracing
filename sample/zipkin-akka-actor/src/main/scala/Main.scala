@@ -3,8 +3,8 @@ import java.util.concurrent.TimeUnit
 import actors.{HelloWorldActor, HelloWorldMessage}
 import akka.actor._
 import akka.util.Timeout
-import jp.co.bizreach.trace.akka.actor.ActorTraceSupport._
-import jp.co.bizreach.trace.akka.actor.ZipkinTraceService
+import brave.play.actor.ActorTraceSupport._
+import brave.play.actor.ZipkinTraceService
 
 import scala.concurrent._
 import scala.concurrent.duration.Duration

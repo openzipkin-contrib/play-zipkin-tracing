@@ -3,18 +3,18 @@ package controllers
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 
+import akka.actor._
+import akka.util.Timeout
+import brave.play.ZipkinTraceServiceLike
+import brave.play.actor.ActorTraceSupport._
+import brave.play.implicits.ZipkinTraceImplicits
 import com.google.inject.Inject
-import jp.co.bizreach.trace.akka.actor.ActorTraceSupport._
 import play.api.Logging
 import play.api.libs.json.Json
 import play.api.mvc._
 import services.ApiSampleService
-import akka.actor._
-import akka.util.Timeout
 
 import scala.concurrent.{ExecutionContext, Future}
-import jp.co.bizreach.trace.ZipkinTraceServiceLike
-import jp.co.bizreach.trace.play.implicits.ZipkinTraceImplicits
 
 class IndexController @Inject() (
   @Named("hello-actor") helloActor: ActorRef,

@@ -1,4 +1,4 @@
-organization := "jp.co.bizreach"
+organization := "io.zipkin.brave.play"
 
 name := """zipkin-akka-actor"""
 
@@ -7,8 +7,8 @@ version := "1.0-SNAPSHOT"
 scalaVersion := "2.12.8"
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "2.2.0",
-  "com.typesafe.akka" %% "akka-actor" % "2.5.21"
+  "io.zipkin.brave.play" %% "play-zipkin-tracing-akka" % "3.0.0",
+  "com.typesafe.akka"    %% "akka-actor" % "2.5.21"
 )
 
 scalacOptions ++= Seq(

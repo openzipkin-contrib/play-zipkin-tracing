@@ -2,7 +2,7 @@ package services
 
 import javax.inject.Inject
 
-import jp.co.bizreach.trace.{TraceData, ZipkinTraceServiceLike}
+import brave.play.{TraceData, ZipkinTraceServiceLike}
 import repositories.ApiRepository
 
 import scala.concurrent.Future
