@@ -9,7 +9,7 @@ Add following dependency to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play" % "2.2.0"
+  "io.zipkin.brave.play" %% "play-zipkin-tracing-play" % "3.0.0"
 )
 ```
 
@@ -34,7 +34,7 @@ zipkin-trace-context {
   }
 }
 
-play.modules.enabled  += "jp.co.bizreach.trace.play.module.ZipkinModule"
+play.modules.enabled  += "brave.play.module.ZipkinModule"
 ```
 
 ## Usage
@@ -45,7 +45,7 @@ Inject `ZipkinTraceFilter` to `filter.Filters`:
 package filters
 
 import javax.inject.Inject
-import jp.co.bizreach.trace.play.filter.ZipkinTraceFilter
+import brave.play.filter.ZipkinTraceFilter
 import play.api.http.DefaultHttpFilters
 
 class Filters @Inject() (
@@ -53,7 +53,7 @@ class Filters @Inject() (
 ) extends DefaultHttpFilters(zipkinTraceFilter)
 ```
 
-In the controller, trace action and calling another services as following:
+In your controller, trace action and calling another services as follows:
 
 
 ```scala
@@ -61,9 +61,9 @@ package controllers
 
 import play.api.mvc._
 import play.api.libs.json.Json
-import jp.co.bizreach.trace.ZipkinTraceServiceLike
-import jp.co.bizreach.trace.play.{TraceWSClient, ZipkinTraceService}
-import jp.co.bizreach.trace.play.implicits.ZipkinTraceImplicits
+import brave.play.ZipkinTraceServiceLike
+import brave.play.{TraceWSClient, ZipkinTraceService}
+import brave.play.implicits.ZipkinTraceImplicits
 import scala.concurrent.{ExecutionContext, Future}
 import javax.inject.Inject
 

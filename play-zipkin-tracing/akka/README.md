@@ -9,7 +9,7 @@ Add following dependency to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-akka" % "2.2.0"
+  "io.zipkin.brave.play" %% "play-zipkin-tracing-akka" % "3.0.0"
 )
 ```
 
@@ -70,7 +70,7 @@ case class HelloWorldMessage(message: String)
 
 ### For Play applications
 
-Play offers [Akka integration](https://www.playframework.com/documentation/2.5.x/ScalaAkka). If you are using play-zipkin-tracing, you can track actor calls from a Play application as well. At first, let's take a look actors called from a Play application:
+Play offers [Akka integration](https://www.playframework.com/documentation/2.7.x/ScalaAkka). If you are using play-zipkin-tracing, you can track actor calls from a Play application as well. At first, let's take a look actors called from a Play application:
 
 ```scala
 case class HelloActorMessage(message: String)

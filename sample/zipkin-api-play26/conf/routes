@@ -1,3 +1,0 @@
-GET / controllers.IndexController.index
-GET /once controllers.IndexController.once
-GET /nest controllers.IndexController.nest

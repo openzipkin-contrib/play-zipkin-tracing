@@ -1,4 +1,4 @@
-organization := "jp.co.bizreach"
+organization := "io.zipkin.brave.play"
 
 name := """zipkin-api-play27"""
 
@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "jp.co.bizreach" %% "play-zipkin-tracing-play" % "2.2.0"
+  "io.zipkin.brave.play" %% "play-zipkin-tracing-play" % "3.0.0"
 )
 
 PlayKeys.playDefaultPort := 9991

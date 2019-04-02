@@ -1,4 +1,0 @@
-GET /api/once controllers.ApiController.once
-GET /api/onceWait controllers.ApiController.onceWait
-
-GET /api/nest controllers.ApiController.nest

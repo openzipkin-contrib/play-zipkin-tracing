@@ -19,10 +19,10 @@ Provides distributed tracing for Play Framework using [Zipkin](https://zipkin.io
 
 - [zipkin-akka-actor](https://github.com/openzipkin-contrib/play-zipkin-tracing/tree/master/sample/zipkin-akka-actor) (Zipkin2)
 - [zipkin-api-play27](https://github.com/openzipkin-contrib/play-zipkin-tracing/tree/master/sample/zipkin-api-play27) (Zipkin2)
-- [zipkin-api-play26](https://github.com/openzipkin-contrib/play-zipkin-tracing/tree/master/sample/zipkin-api-play26) (Zipkin2)
-- [zipkin-api-play25](https://github.com/openzipkin-contrib/play-zipkin-tracing/tree/master/sample/zipkin-api-play25) (Zipkin1)
-- [zipkin-api-play24](https://github.com/openzipkin-contrib/play-zipkin-tracing/tree/master/sample/zipkin-api-play24) (Zipkin1)
-- [zipkin-api-play23](https://github.com/openzipkin-contrib/play-zipkin-tracing/tree/master/sample/zipkin-api-play23) (Zipkin1)
+- [zipkin-api-play26](https://github.com/openzipkin-contrib/play-zipkin-tracing/blob/2.1.0/sample/zipkin-api-play26) (Zipkin2)
+- [zipkin-api-play25](https://github.com/openzipkin-contrib/play-zipkin-tracing/blob/1.2.0/sample/zipkin-api-play25) (Zipkin1)
+- [zipkin-api-play24](https://github.com/openzipkin-contrib/play-zipkin-tracing/blob/1.2.0/sample/zipkin-api-play24) (Zipkin1)
+- [zipkin-api-play23](https://github.com/openzipkin-contrib/play-zipkin-tracing/blob/1.2.0/sample/zipkin-api-play23) (Zipkin1)
 
 ### How to run sample projects
 
@@ -36,6 +36,7 @@ Provides distributed tracing for Play Framework using [Zipkin](https://zipkin.io
 2. Run zipkin-api-play24 project
 
   ```
+  $ git checkout 1.2.0 -- sample/zipkin-api-play24
   $ cd sample/zipkin-api-play24
   $ sbt run
   ```
