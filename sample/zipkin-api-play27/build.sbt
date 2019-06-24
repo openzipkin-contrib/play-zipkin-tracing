@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "io.zipkin.brave.play" %% "play-zipkin-tracing-play" % "3.0.0"
+  "io.zipkin.brave.play" %% "play-zipkin-tracing-play" % "3.0.1"
 )
 
 PlayKeys.playDefaultPort := 9991
