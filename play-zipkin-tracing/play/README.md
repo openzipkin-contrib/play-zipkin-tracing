@@ -9,7 +9,7 @@ Add following dependency to `build.sbt`:
 
 ```scala
 libraryDependencies ++= Seq(
-  "io.zipkin.brave.play" %% "play-zipkin-tracing-play" % "3.0.0"
+  "io.zipkin.brave.play" %% "play-zipkin-tracing-play" % "3.0.1"
 )
 ```
 
