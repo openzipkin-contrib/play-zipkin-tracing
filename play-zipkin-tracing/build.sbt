@@ -2,7 +2,7 @@ lazy val commonSettings = Seq(
   organization := "io.zipkin.brave.play",
   version := "3.0.1-SNAPSHOT",
   scalaVersion := "2.12.8",
-  crossScalaVersions := Seq(scalaVersion.value, "2.13.0-M5"),
+  crossScalaVersions := Seq(scalaVersion.value, "2.13.0"),
   publishMavenStyle := true,
   publishTo := {
     val nexus = "https://oss.sonatype.org/"
@@ -38,8 +38,8 @@ lazy val commonSettings = Seq(
   )
 )
 
-val playVersion = "2.7.0"
-val akkaVersion = "2.5.21"
+val playVersion = "2.7.3"
+val akkaVersion = "2.5.23"
 
 lazy val root = (project in file(".")).
   settings(commonSettings: _*).
@@ -54,11 +54,11 @@ lazy val core = (project in file("core")).
   settings(
     name := "play-zipkin-tracing-core",
     libraryDependencies ++= Seq(
-      "org.apache.commons" % "commons-lang3" % "3.8.1",
-      "io.zipkin.brave" % "brave" % "5.6.1",
-      "io.zipkin.reporter2" % "zipkin-sender-okhttp3" % "2.7.15",
-      "org.scalatest" %% "scalatest" % "3.0.6-SNAP6" % "test",
-      "io.zipkin.brave" % "brave-tests" % "5.6.1" % "test",
+      "org.apache.commons" % "commons-lang3" % "3.9",
+      "io.zipkin.brave" % "brave" % "5.6.5",
+      "io.zipkin.reporter2" % "zipkin-sender-okhttp3" % "2.8.4",
+      "org.scalatest" %% "scalatest" % "3.0.8" % "test",
+      "io.zipkin.brave" % "brave-tests" % "5.6.5" % "test",
       "junit" % "junit" % "4.12" % "test",
       "com.novocode" % "junit-interface" % "0.11" % "test"
     ),
