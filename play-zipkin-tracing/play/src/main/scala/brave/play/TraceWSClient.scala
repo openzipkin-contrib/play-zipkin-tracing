@@ -2,8 +2,8 @@ package brave.play
 
 import java.io.{File, IOException}
 import java.net.URI
-import javax.inject.Inject
 
+import javax.inject.Inject
 import akka.stream.scaladsl.Source
 import akka.util.ByteString
 import play.api.libs.ws._
@@ -65,12 +65,22 @@ private class TraceWSRequest(spanName: String, request: WSRequest, tracer: Zipki
   override def withUrl(url: String): TraceWSRequest = new TraceWSRequest(spanName, request.withUrl(url), tracer, traceData)
   override def withMethod(method: String): TraceWSRequest = new TraceWSRequest(spanName, request.withMethod(method), tracer, traceData)
 
-  override def execute(): Future[Response] = tracer.traceFuture(spanName){ data =>
-    request.addHttpHeaders(tracer.toMap(data.span).toSeq: _*).execute()
-  }(traceData)
-  override def stream(): Future[Response] = tracer.traceFuture(spanName){ data =>
-    request.addHttpHeaders(tracer.toMap(data.span).toSeq: _*).stream()
-  }(traceData)
+  private def executeTraced(executeRequestFn: WSRequest => Future[Response]): Future[Response] = {
+    val tracingTags = List(
+      "http.method" -> this.method,
+      "http.path" -> this.uri.getPath,
+      "http.host" -> this.uri.getHost
+    )
+
+    tracer.traceFuture(spanName, tracingTags: _*) { data =>
+      val tracedRequest = request.addHttpHeaders(tracer.toMap(data.span).toSeq: _*)
+      executeRequestFn.apply(tracedRequest)
+    }(traceData)
+  }
+
+  override def execute(): Future[Response] = executeTraced { _.execute() }
+
+  override def stream(): Future[Response] = executeTraced { _.stream() }
 
   override def uri: URI = request.uri
   override def contentType: Option[String] = request.contentType
