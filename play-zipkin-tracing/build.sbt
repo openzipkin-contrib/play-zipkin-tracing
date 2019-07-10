@@ -83,7 +83,9 @@ lazy val play = (project in file("play")).
     libraryDependencies ++= Seq(
       "com.typesafe.play" %% "play" % playVersion % Provided,
       "com.typesafe.play" %% "play-ws" % playVersion % Provided,
-      "com.typesafe.play" %% "play-guice" % playVersion % Test
+      "com.typesafe.play" %% "play-guice" % playVersion % Test,
+      "com.typesafe.play" %% "play-ahc-ws" % playVersion % Test,
+      "de.leanovate.play-mockws" %% "play-mockws" % "2.7.0" % Test
     )
   ).dependsOn(
     core % "test->test;compile->compile",
