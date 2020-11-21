@@ -19,7 +19,7 @@
 
   <groupId>io.zipkin.brave.play</groupId>
   <artifactId>play-zipkin-tracing-parent_2.12</artifactId>
-  <version>3.0.3-SNAPSHOT</version>
+  <version>3.0.2</version>
 
   <packaging>pom</packaging>
 
@@ -90,7 +90,7 @@
     <url>https://github.com/openzipkin-contrib/play-zipkin-tracing</url>
     <connection>scm:git:https://github.com/openzipkin-contrib/play-zipkin-tracing.git</connection>
     <developerConnection>scm:git:https://github.com/openzipkin-contrib/play-zipkin-tracing.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>3.0.2</tag>
   </scm>
 
   <!-- Developer section is needed for Maven Central, but doesn't need to include each person -->
