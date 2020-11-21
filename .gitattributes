@@ -1,0 +1,31 @@
+* text=auto
+
+*.java          text
+*.scala         text
+*.sbt           text
+*.properties    text
+*.groovy        text
+*.gradle        text
+*.sh            text
+*.bat           text
+*.txt           text
+*.md            text
+*.xml           text
+*.yml           text
+*.json          text
+*.css           text
+*.htm           text
+*.html          text
+*.js            text
+
+*.class         binary
+*.dll           binary
+*.ear           binary
+*.gif           binary
+*.ico           binary
+*.jar           binary
+*.jpg           binary
+*.jpeg          binary
+*.png           binary
+*.so            binary
+*.war           binary
