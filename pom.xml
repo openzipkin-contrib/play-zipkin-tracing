@@ -54,6 +54,7 @@
     <junit.version>4.13.1</junit.version>
     <scalatest.version>3.0.9</scalatest.version>
 
+    <genjavadoc-plugin.version>0.16</genjavadoc-plugin.version>
     <go-offline-maven-plugin.version>1.2.7</go-offline-maven-plugin.version>
     <!-- TODO: cleanup any redundant ignores now also in the 4.0 release (once final) -->
     <license-maven-plugin.version>4.0.rc2</license-maven-plugin.version>
@@ -193,6 +194,8 @@
   </dependencies>
 
   <build>
+    <sourceDirectory>${project.basedir}/src/main/scala</sourceDirectory>
+    <testSourceDirectory>${project.basedir}/src/test/scala</testSourceDirectory>
     <pluginManagement>
       <plugins>
         <!-- mvn -N io.takari:maven:wrapper generates the ./mvnw script -->
@@ -218,6 +221,12 @@
                 <artifactId>${main.signature.artifact}</artifactId>
                 <version>1.0</version>
                 <type>signature</type>
+                <repositoryType>MAIN</repositoryType>
+              </DynamicDependency>
+              <DynamicDependency>
+                <groupId>com.typesafe.genjavadoc</groupId>
+                <artifactId>genjavadoc-plugin_${scala-library.version}</artifactId>
+                <version>${genjavadoc-plugin.version}</version>
                 <repositoryType>MAIN</repositoryType>
               </DynamicDependency>
               <DynamicDependency>
@@ -350,32 +359,6 @@
       </plugin>
 
       <plugin>
-        <artifactId>maven-invoker-plugin</artifactId>
-        <version>3.2.1</version>
-        <configuration>
-          <cloneProjectsTo>${project.build.directory}/it</cloneProjectsTo>
-          <settingsFile>${main.basedir}/src/it/settings.xml</settingsFile>
-          <profiles>
-            <profile>!release</profile>
-          </profiles>
-          <localRepositoryPath>${project.build.directory}/local-repo</localRepositoryPath>
-          <postBuildHookScript>verify</postBuildHookScript>
-          <addTestClassPath>true</addTestClassPath>
-          <skipInvocation>${skipTests}</skipInvocation>
-          <streamLogs>true</streamLogs>
-          <mavenOpts>-Dorg.slf4j.simpleLogger.defaultLogLevel=WARN</mavenOpts>
-        </configuration>
-        <executions>
-          <execution>
-            <goals>
-              <goal>install</goal>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>com.mycila</groupId>
         <artifactId>license-maven-plugin</artifactId>
         <version>${license-maven-plugin.version}</version>
@@ -486,27 +469,6 @@
             </executions>
           </plugin>
 
-          <plugin>
-            <artifactId>maven-enforcer-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>enforce-java</id>
-                <goals>
-                  <goal>enforce</goal>
-                </goals>
-                <configuration>
-                  <rules>
-                    <!-- JDK 12+ can no longer generate Java 1.6 bytecode, so we require JDK 11.
-                         https://www.oracle.com/java/technologies/javase/12-relnote-issues.html -->
-                    <requireJavaVersion>
-                      <version>[11,12)</version>
-                    </requireJavaVersion>
-                  </rules>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-
           <!-- Creates source jar -->
           <plugin>
             <artifactId>maven-source-plugin</artifactId>
@@ -517,6 +479,52 @@
                 <goals>
                   <goal>jar</goal>
                 </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.scala-tools</groupId>
+            <artifactId>maven-scala-plugin</artifactId>
+            <version>2.15.2</version>
+            <executions>
+              <execution>
+                <id>scala-compile-first</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+                <configuration>
+                  <args>
+                    <arg>-P:genjavadoc:out=${project.build.directory}/genjavadoc</arg>
+                  </args>
+                  <compilerPlugins>
+                    <compilerPlugin>
+                      <groupId>com.typesafe.genjavadoc</groupId>
+                      <artifactId>genjavadoc-plugin_${scala-library.version}</artifactId>
+                      <version>${genjavadoc-plugin.version}</version>
+                    </compilerPlugin>
+                  </compilerPlugins>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <version>3.2.0</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>${project.build.directory}/genjavadoc</source>
+                  </sources>
+                </configuration>
               </execution>
             </executions>
           </plugin>
