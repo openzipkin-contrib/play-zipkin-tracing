@@ -7,7 +7,7 @@ version := "1.0-SNAPSHOT"
 scalaVersion := "2.12.11"
 
 libraryDependencies ++= Seq(
-  "io.zipkin.brave.play" %% "play-zipkin-tracing-akka" % "3.0.1",
+  "io.zipkin.brave.play" %% "play-zipkin-tracing-akka" % "3.0.2",
   "com.typesafe.akka"    %% "akka-actor" % "2.5.32"
 )
 
