@@ -49,7 +49,7 @@ $ curl http://localhost:9991/nest
 
 Then you can see traced data on Zipkin UI (http://localhost:9411/zipkin) as:
 
-!![Zipkin Screen Shot](https://user-images.githubusercontent.com/64215/99867404-281dfa80-2bf4-11eb-83b0-03275a363712.png)
+![Zipkin Screen Shot](https://user-images.githubusercontent.com/64215/99867404-281dfa80-2bf4-11eb-83b0-03275a363712.png)
 
 ## Artifacts
 All artifacts publish to the group ID "io.zipkin.brave.play". We use a common release version for
