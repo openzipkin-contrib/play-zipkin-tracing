@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -ue
+
+# This script deploys a master or release version.
+#
+# See [README.md] for an explanation of this and how CI should use it.
+
+build-bin/maven/maven_deploy
+# Deploy scala 2.13 also
+find . -type f -name pom.xml -exec sed -i 's/_2.12/_2.13/g' {} \;
+build-bin/maven/maven_deploy -Dscala-library.version=2.13.4
