@@ -33,7 +33,15 @@ $ cd sample/zipkin-api-play27
 $ sbt run
 ```
 
-3. Hit http://localhost:9991/nest in some way
+3. Run zipkin-api-play24 project
+
+```bash
+$ git checkout 1.2.0 -- sample/zipkin-api-play24
+$ cd sample/zipkin-api-play24
+$ sbt run
+```
+
+4. Hit http://localhost:9991/nest in some way
 
 ```bash
 $ curl http://localhost:9991/nest
@@ -41,7 +49,7 @@ $ curl http://localhost:9991/nest
 
 Then you can see traced data on Zipkin UI (http://localhost:9411/zipkin) as:
 
-![sample](sample.png)
+!![Zipkin Screen Shot](https://user-images.githubusercontent.com/64215/99867404-281dfa80-2bf4-11eb-83b0-03275a363712.png)
 
 ## Artifacts
 All artifacts publish to the group ID "io.zipkin.brave.play". We use a common release version for
